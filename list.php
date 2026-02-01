@@ -9,7 +9,11 @@
  * Initialization
  */
 require_once '../kernel/includes/setup_inc.php';
-require_once( ARTICLES_PKG_CLASS_PATH.'BitArticle.php' );
+use Bitweaver\Articles\BitArticle;
+use Bitweaver\Articles\BitArticleTopic;
+use Bitweaver\Articles\BitArticleType;
+use Bitweaver\KernelTools;
+
 include_once( ARTICLES_PKG_INCLUDE_PATH.'article_filter_inc.php' );
 
 // Is package installed and enabled
@@ -36,21 +40,21 @@ if( !empty( $_REQUEST['action'] ) ) {
 
 		if( isset( $_REQUEST["confirm"] ) ) {
 			if( $tmpArt->expunge() ) {
-				bit_redirect( ARTICLES_PKG_URL.'list.php?status_id='.( !empty( $_REQUEST['status_id'] ) ? $_REQUEST['status_id'] : '' ) );
+				KernelTools::bit_redirect( ARTICLES_PKG_URL.'list.php?status_id='.( !empty( $_REQUEST['status_id'] ) ? $_REQUEST['status_id'] : '' ) );
 			} else {
 				$feedback['error'] = $tmpArt->mErrors;
 			}
 		}
-		$gBitSystem->setBrowserTitle( tra('Confirm removal of'). ' ' .$tmpArt->mInfo['title'] );
+		$gBitSystem->setBrowserTitle( KernelTools::tra('Confirm removal of'). ' ' .$tmpArt->mInfo['title'] );
 		$formHash['remove'] = TRUE;
 		$formHash['action'] = 'remove';
 		$formHash['status_id'] = ( !empty( $_REQUEST['status_id'] ) ? $_REQUEST['status_id'] : '' );
 		$formHash['remove_article_id'] = $_REQUEST['remove_article_id'];
 		$msgHash = array(
-			'label' => tra('Remove Article'),
+			'label' => KernelTools::tra('Remove Article'),
 			'confirm_item' => $tmpArt->mInfo['title'],
-			'warning' => tra('Remove the above article.'),
-			'error' => tra('This cannot be undone!'),
+			'warning' => KernelTools::tra('Remove the above article.'),
+			'error' => KernelTools::tra('This cannot be undone!'),
 		);
 		$gBitSystem->confirmDialog( $formHash, $msgHash );
 	}
@@ -79,4 +83,4 @@ $gBitSmarty->assign( 'listInfo', $_REQUEST['listInfo'] );
 $gBitSmarty->assign( 'listpages', $listArticles );
 
 // Display the template
-$gBitSystem->display( 'bitpackage:articles/list_articles.tpl', tra( "Articles" ), array( 'display_mode' => 'list' ));
+$gBitSystem->display( 'bitpackage:articles/list_articles.tpl', KernelTools::tra( "Articles" ), array( 'display_mode' => 'list' ));

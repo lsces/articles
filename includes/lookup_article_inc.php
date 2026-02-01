@@ -8,7 +8,8 @@
 /**
  * Initialization
  */
-require_once( ARTICLES_PKG_CLASS_PATH.'BitArticle.php');
+use Bitweaver\Articles\BitArticle;
+use Bitweaver\BitBase;
 require_once( LIBERTY_PKG_INCLUDE_PATH.'lookup_content_inc.php' );
 
 // if we already have a gContent, we assume someone else created it for us, and has properly loaded everything up.

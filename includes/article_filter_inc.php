@@ -4,6 +4,9 @@
  * @package articles
  * @subpackage functions
  */
+use Bitweaver\Articles\BitArticle;
+use Bitweaver\Articles\BitArticleTopic;
+use Bitweaver\Articles\BitArticleType;
 
 if( $gBitSystem->isFeatureActive( 'articles_display_filter_bar' ) && ( $gBitUser->isAdmin() || $gBitUser->hasPermission( 'p_articles_admin' ) ) ) {
 	$filter['topic'][]  = '';

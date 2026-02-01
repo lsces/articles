@@ -5,13 +5,13 @@
 // removed size, topic_name (replaced with topic_id)
 // replaced type_name with article_type_id
 
-$tables = array(
+$tables = [
 	'article_status' => "
 		status_id	I4 PRIMARY,
 		status_name C(64)
 	",
 
-	'article_types' => "
+	'article_types'  => "
 		article_type_id I4 PRIMARY,
 		type_name C(50),
 		use_ratings C(1),
@@ -38,7 +38,7 @@ $tables = array(
 		created I8
 	",
 
-	'articles' => "
+	'articles'       => "
 		article_id I4 PRIMARY,
 		content_id I4 NOTNULL,
 		description X,
@@ -49,12 +49,12 @@ $tables = array(
 		topic_id I4,
 		rating F,
 		status_id I4
-		CONSTRAINT ', CONSTRAINT `articles_content_ref` FOREIGN KEY (`content_id`) REFERENCES `".BIT_DB_PREFIX."liberty_content` (`content_id`)
-					, CONSTRAINT `articles_topic_ref` FOREIGN KEY (`topic_id`) REFERENCES `".BIT_DB_PREFIX."article_topics` (`topic_id`)
-					, CONSTRAINT `articles_type_ref` FOREIGN KEY (`article_type_id`) REFERENCES `".BIT_DB_PREFIX."article_types` (`article_type_id`)
-					, CONSTRAINT `articles_status` FOREIGN KEY (`status_id`) REFERENCES `".BIT_DB_PREFIX."article_status` (`status_id`)'
+		CONSTRAINT ', CONSTRAINT `articles_content_ref` FOREIGN KEY (`content_id`) REFERENCES `" . BIT_DB_PREFIX . "liberty_content` (`content_id`)
+					, CONSTRAINT `articles_topic_ref` FOREIGN KEY (`topic_id`) REFERENCES `" . BIT_DB_PREFIX . "article_topics` (`topic_id`)
+					, CONSTRAINT `articles_type_ref` FOREIGN KEY (`article_type_id`) REFERENCES `" . BIT_DB_PREFIX . "article_types` (`article_type_id`)
+					, CONSTRAINT `articles_status` FOREIGN KEY (`status_id`) REFERENCES `" . BIT_DB_PREFIX . "article_status` (`status_id`)'
 	",
-);
+];
 
 global $gBitInstaller;
 
@@ -80,65 +80,65 @@ $gBitInstaller->registerSchemaSequences( ARTICLES_PKG_NAME, $sequences );
 // $indices = array();
 // $gBitInstaller->registerSchemaIndexes( ARTICLES_PKG_NAME, $indices );
 
-$gBitInstaller->registerSchemaDefault( ARTICLES_PKG_NAME, array(
-	"INSERT INTO `".BIT_DB_PREFIX."article_types` (`article_type_id`, `type_name`) VALUES (1, 'Article')",
-	"INSERT INTO `".BIT_DB_PREFIX."article_types` (`article_type_id`, `type_name`, `use_ratings`) VALUES (2, 'Review','y')",
-	"INSERT INTO `".BIT_DB_PREFIX."article_types` (`article_type_id`, `type_name`, `show_post_expire`) VALUES (3, 'Event','n')",
-	"INSERT INTO `".BIT_DB_PREFIX."article_types` (`article_type_id`, `type_name`, `show_post_expire`,`heading_only`,`allow_comments`) VALUES (4, 'Classified','n','y','n')",
-	"INSERT INTO `".BIT_DB_PREFIX."article_status` (`status_id`, `status_name`) VALUES (  0, 'Denied') ",
-	"INSERT INTO `".BIT_DB_PREFIX."article_status` (`status_id`, `status_name`) VALUES (100, 'Draft') ",
-	"INSERT INTO `".BIT_DB_PREFIX."article_status` (`status_id`, `status_name`) VALUES (200, 'Pending Approval') ",
-	"INSERT INTO `".BIT_DB_PREFIX."article_status` (`status_id`, `status_name`) VALUES (300, 'Approved') ",
-	"INSERT INTO `".BIT_DB_PREFIX."article_status` (`status_id`, `status_name`) VALUES (400, 'Retired') "
-) );
+$gBitInstaller->registerSchemaDefault( ARTICLES_PKG_NAME, [
+	"INSERT INTO `" . BIT_DB_PREFIX . "article_types` (`article_type_id`, `type_name`) VALUES (1, 'Article')",
+	"INSERT INTO `" . BIT_DB_PREFIX . "article_types` (`article_type_id`, `type_name`, `use_ratings`) VALUES (2, 'Review','y')",
+	"INSERT INTO `" . BIT_DB_PREFIX . "article_types` (`article_type_id`, `type_name`, `show_post_expire`) VALUES (3, 'Event','n')",
+	"INSERT INTO `" . BIT_DB_PREFIX . "article_types` (`article_type_id`, `type_name`, `show_post_expire`,`heading_only`,`allow_comments`) VALUES (4, 'Classified','n','y','n')",
+	"INSERT INTO `" . BIT_DB_PREFIX . "article_status` (`status_id`, `status_name`) VALUES (  0, 'Denied') ",
+	"INSERT INTO `" . BIT_DB_PREFIX . "article_status` (`status_id`, `status_name`) VALUES (100, 'Draft') ",
+	"INSERT INTO `" . BIT_DB_PREFIX . "article_status` (`status_id`, `status_name`) VALUES (200, 'Pending Approval') ",
+	"INSERT INTO `" . BIT_DB_PREFIX . "article_status` (`status_id`, `status_name`) VALUES (300, 'Approved') ",
+	"INSERT INTO `" . BIT_DB_PREFIX . "article_status` (`status_id`, `status_name`) VALUES (400, 'Retired') "
+] );
 
 // ### Default UserPermissions
-$gBitInstaller->registerUserPermissions( ARTICLES_PKG_NAME, array(
-	array('p_articles_update', 'Can update articles', 'editors', ARTICLES_PKG_NAME),
-	array('p_articles_remove', 'Can remove articles', 'editors', ARTICLES_PKG_NAME),
-	array('p_articles_read', 'Can read articles', 'basic', ARTICLES_PKG_NAME),
-	array('p_articles_read_history', 'Can read article history', 'registered', ARTICLES_PKG_NAME),
-	array('p_articles_submit', 'Can submit articles', 'basic', ARTICLES_PKG_NAME),
-	array('p_articles_update_submission', 'Can update submissions', 'editors', ARTICLES_PKG_NAME),
-	array('p_articles_remove_submission', 'Can remove submissions', 'editors', ARTICLES_PKG_NAME),
-	array('p_articles_approve_submission', 'Can approve submissions', 'editors', ARTICLES_PKG_NAME),
-	array('p_articles_send', 'Can send articles to other sites', 'editors', ARTICLES_PKG_NAME),
-	array('p_articles_sendme', 'Can send articles to this site', 'registered', ARTICLES_PKG_NAME),
-	array('p_articles_auto_approve', 'Submited articles automatically approved', 'editors', ARTICLES_PKG_NAME),
-	array('p_articles_admin', 'Can admin the articles package', 'editors', ARTICLES_PKG_NAME),
-) );
+$gBitInstaller->registerUserPermissions( ARTICLES_PKG_NAME, [
+	[ 'p_articles_update', 'Can update articles', 'editors', ARTICLES_PKG_NAME ],
+	[ 'p_articles_remove', 'Can remove articles', 'editors', ARTICLES_PKG_NAME ],
+	[ 'p_articles_read', 'Can read articles', 'basic', ARTICLES_PKG_NAME ],
+	[ 'p_articles_read_history', 'Can read article history', 'registered', ARTICLES_PKG_NAME ],
+	[ 'p_articles_submit', 'Can submit articles', 'basic', ARTICLES_PKG_NAME ],
+	[ 'p_articles_update_submission', 'Can update submissions', 'editors', ARTICLES_PKG_NAME ],
+	[ 'p_articles_remove_submission', 'Can remove submissions', 'editors', ARTICLES_PKG_NAME ],
+	[ 'p_articles_approve_submission', 'Can approve submissions', 'editors', ARTICLES_PKG_NAME ],
+	[ 'p_articles_send', 'Can send articles to other sites', 'editors', ARTICLES_PKG_NAME ],
+	[ 'p_articles_sendme', 'Can send articles to this site', 'registered', ARTICLES_PKG_NAME ],
+	[ 'p_articles_auto_approve', 'Submited articles automatically approved', 'editors', ARTICLES_PKG_NAME ],
+	[ 'p_articles_admin', 'Can admin the articles package', 'editors', ARTICLES_PKG_NAME ],
+] );
 
 // ### Default Preferences
-$gBitInstaller->registerPreferences( ARTICLES_PKG_NAME, array(
-	array( ARTICLES_PKG_NAME, 'articles_attachments','y'),
-	array( ARTICLES_PKG_NAME, 'articles_list_author','y'),
-	array( ARTICLES_PKG_NAME, 'articles_list_date','y'),
-	array( ARTICLES_PKG_NAME, 'articles_list_img','y'),
-	array( ARTICLES_PKG_NAME, 'articles_list_reads','y'),
-	array( ARTICLES_PKG_NAME, 'articles_list_size','y'),
-	array( ARTICLES_PKG_NAME, 'articles_list_title','y'),
-	array( ARTICLES_PKG_NAME, 'articles_list_topic','y'),
-	array( ARTICLES_PKG_NAME, 'articles_list_type','y'),
-	array( ARTICLES_PKG_NAME, 'articles_list_expire','y'),
-	array( ARTICLES_PKG_NAME, 'articles_max_list','10'),
-	array( ARTICLES_PKG_NAME, 'articles_rankings','y'),
-	array( ARTICLES_PKG_NAME, 'articles_submissions', 'y'),
-	array( ARTICLES_PKG_NAME, 'articles_description_length', '500'),
-	array( ARTICLES_PKG_NAME, 'articles_date_threshold', 'week'),
-) );
+$gBitInstaller->registerPreferences( ARTICLES_PKG_NAME, [
+	[ ARTICLES_PKG_NAME, 'articles_attachments', 'y' ],
+	[ ARTICLES_PKG_NAME, 'articles_list_author', 'y' ],
+	[ ARTICLES_PKG_NAME, 'articles_list_date', 'y' ],
+	[ ARTICLES_PKG_NAME, 'articles_list_img', 'y' ],
+	[ ARTICLES_PKG_NAME, 'articles_list_reads', 'y' ],
+	[ ARTICLES_PKG_NAME, 'articles_list_size', 'y' ],
+	[ ARTICLES_PKG_NAME, 'articles_list_title', 'y' ],
+	[ ARTICLES_PKG_NAME, 'articles_list_topic', 'y' ],
+	[ ARTICLES_PKG_NAME, 'articles_list_type', 'y' ],
+	[ ARTICLES_PKG_NAME, 'articles_list_expire', 'y' ],
+	[ ARTICLES_PKG_NAME, 'articles_max_list', '10' ],
+	[ ARTICLES_PKG_NAME, 'articles_rankings', 'y' ],
+	[ ARTICLES_PKG_NAME, 'articles_submissions', 'y' ],
+	[ ARTICLES_PKG_NAME, 'articles_description_length', '500' ],
+	[ ARTICLES_PKG_NAME, 'articles_date_threshold', 'week' ],
+] );
 
 if( defined( 'RSS_PKG_NAME' )) {
 	$gBitInstaller->registerPreferences( ARTICLES_PKG_NAME, array(
-		array( RSS_PKG_NAME, ARTICLES_PKG_NAME.'_rss', 'y'),
+		[ RSS_PKG_NAME, ARTICLES_PKG_NAME . '_rss', 'y' ],
 	));
 }
 
 // ### Register content types
-$gBitInstaller->registerContentObjects( ARTICLES_PKG_NAME, array( 
-	'BitArticle'=>ARTICLES_PKG_CLASS_PATH.'BitArticle.php',
-));
+$gBitInstaller->registerContentObjects( ARTICLES_PKG_NAME, [
+	'BitArticle' => ARTICLES_PKG_CLASS_PATH . 'BitArticle.php',
+]);
 
 // Requirements
-$gBitInstaller->registerRequirements( ARTICLES_PKG_NAME, array(
-	'liberty' => array( 'min' => '2.1.4' ),
-));
+$gBitInstaller->registerRequirements( ARTICLES_PKG_NAME, [
+	'liberty' => [ 'min' => '5.0.0' ],
+]);

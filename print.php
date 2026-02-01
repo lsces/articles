@@ -1,4 +1,5 @@
 <?php 
+
 /**
  * @version $Header$
  * @package articles
@@ -9,11 +10,12 @@
  * Initialization
  */
 require_once '../kernel/includes/setup_inc.php';
+use Bitweaver\KernelTools;
 
 include_once( ARTICLES_PKG_PATH . 'art_lib.php' );
 
 if ( !isset( $_REQUEST["article_id"] ) ) {
-    $gBitSmarty->assign( 'msg', tra( "No article indicated" ) );
+    $gBitSmarty->assign( 'msg', KernelTools::tra( "No article indicated" ) );
 
     $gBitSmarty->display( "error.tpl" );
     die;
@@ -26,14 +28,14 @@ if ( isset( $_REQUEST["article_id"] ) ) {
     $article_data = $artlib->get_article( $_REQUEST["article_id"] );
 
     if ( !$article_data ) {
-        $gBitSmarty->assign( 'msg', tra( "Article not found" ) );
+        $gBitSmarty->assign( 'msg', KernelTools::tra( "Article not found" ) );
 
         $gBitSmarty->display( "error.tpl" );
         die;
     } 
 
 	if ( ( $article_data["publish_date"] > date( "U" ) ) && ( !$gBitUser->isAdmin() ) ) {
-        $gBitSmarty->assign( 'msg', tra( "Article is not published yet" ) );
+        $gBitSmarty->assign( 'msg', KernelTools::tra( "Article is not published yet" ) );
 
         $gBitSmarty->display( "error.tpl" );
         die;

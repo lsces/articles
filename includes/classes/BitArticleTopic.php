@@ -11,35 +11,40 @@
 /**
  * Required setup
  */
-global $gBitSystem;
-require_once( KERNEL_PKG_CLASS_PATH.'BitBase.php' );
-require_once( ARTICLES_PKG_CLASS_PATH.'BitArticle.php' );
+namespace Bitweaver\Articles;
+use Bitweaver\BitBase;
+use Bitweaver\KernelTools;
 
 /**
  * @package articles
  */
-class BitArticleTopic extends BitBase {
-	var $mTopicId;
+class BitArticleTopic extends BitBase
+{
+	public $mTopicId;
+	public $mArticleId;
 
-	function __construct($iTopicId = NULL, $iTopicName = NULL) {
+	public function __construct($iTopicId = NULL, $iTopicName = NULL)
+	{
 		$this->mTopicId = NULL;
 		parent::__construct();
 		if ($iTopicId || $iTopicName) {
-			$this->loadTopic(array('topic_id'=>$iTopicId, 'topic_name'=>$iTopicName));
+			$this->loadTopic( [ 'topic_id' => $iTopicId, 'topic_name' => $iTopicName ]);
 		}
 	}
 
-	function isValid() {
+	public function isValid()
+	{
 		return ($this->verifyId($this->mTopicId));
 	}
 
-	function loadTopic($iParamHash = NULL) {
+	public function loadTopic($iParamHash = NULL)
+	{
 		$whereSQL = ' WHERE artt.';
 		$ret = NULL;
 
 		if (@$this->verifyId($iParamHash['topic_id']) || !empty($iParamHash['topic_name'])) {
 			$whereSQL .= "`".((@$this->verifyId($iParamHash['topic_id']) || $this->mTopicId) ? 'topic_id' : 'topic_name')."` = ?";
-			$bindVars = array((@$this->verifyId($iParamHash['topic_id']) ? (int)$iParamHash['topic_id'] : ($this->mTopicId ? $this->mTopicId : $iParamHash['topic_name'])) );
+			$bindVars = [ ( @$this->verifyId( $iParamHash['topic_id'] ) ? (int) $iParamHash['topic_id'] : ( $this->mTopicId ?: $iParamHash['topic_name'] ) ) ];
 
 			$sql = "SELECT artt.*".
 				   "FROM `".BIT_DB_PREFIX."article_topics` artt ".
@@ -49,49 +54,35 @@ class BitArticleTopic extends BitBase {
 			if( !empty( $this->mInfo['topic_id'] ) ) {
 				$this->mTopicId = $this->mInfo['topic_id'];
 
-				if ($this->mInfo['has_topic_image']) {
-					$this->mInfo['topic_image_url'] = static::getTopicImageStorageUrl($this->mTopicId, FALSE, TRUE);
-				} else {
-					$this->mInfo['topic_image_url'] = NULL;
-				}
+				$this->mInfo['topic_image_url'] = ( $this->mInfo['has_topic_image'] ) ? $this->getTopicImageStorageUrl( null, false, true ) : null;
 			}
 		}
 
 		return $ret;
 	}
 
-	function verify(&$iParamHash) {
+	public function verify(&$iParamHash)
+	{
 		// Validate the (optional) topic_id parameter
-		if (@$this->verifyId($iParamHash['topic_id'])) {
-			$cleanHash['topic_id'] = (int)$iParamHash['topic_id'];
-		} else {
-			$cleanHash['topic_id'] = NULL;
-		}
+		$cleanHash['topic_id'] = ( @$this->verifyId( $iParamHash['topic_id'] ) ) ? (int) $iParamHash['topic_id'] : null;
 
 		// Was an acceptable name given?
 		if (empty($iParamHash['topic_name']) || ($iParamHash['topic_name'] == '')) {
-			$this->mErrors['topic_name'] = tra("Invalid or blank topic name supplied");
-		} else if (empty($iParamHash['topic_id'])) {
-			$ret = $this->getTopicList( array( 'topic_name' => $iParamHash['topic_name'] ) );
+			$this->mErrors['topic_name'] = KernelTools::tra("Invalid or blank topic name supplied");
+		} elseif (empty($iParamHash['topic_id'])) {
+			$ret = $this->getTopicList( [ 'topic_name' => $iParamHash['topic_name'] ] );
 			if ( sizeof( $ret ) ) {
 				$this->mErrors['topic_name'] = 'Topic "'.$iParamHash['topic_name'].'" already exists. Please choose a different name.';
 			} else {
 				$cleanHash['topic_name'] = $iParamHash['topic_name'];
 			}
-		}
-		else {
+		} else {
 			$cleanHash['topic_name'] = $iParamHash['topic_name'];
 		}
 
-
 		// Whether the topic is active or not
 		if ( empty($iParamHash['active_topic']) || (strtoupper($iParamHash['active_topic']) != 'CHECKED' && strtoupper($iParamHash['active_topic']) != 'ON' && strtoupper($iParamHash['active_topic']) != 'Y')) {
-			if (@$this->verifyId($cleanHash['topic_id'])) {
-				$cleanHash['active_topic'] = 'n';
-			} else {
-				// Probably a new topic so lets go ahead and enable it
-				$cleanHash['active_topic'] = 'y';
-			}
+			$cleanHash['active_topic'] = ( @$this->verifyId( $cleanHash['topic_id'] ) ) ? 'n' : 'y';
 		} else {
 			$cleanHash['active_topic'] = 'y';
 		}
@@ -106,28 +97,25 @@ class BitArticleTopic extends BitBase {
 		return(count($this->mErrors) == 0);
 	}
 
-	function storeTopic($iParamHash = NULL) {
+	public function storeTopic($iParamHash = NULL)
+	{
 		global $gLibertySystem;
 		global $gBitUser;
 
 		if ($this->verify($iParamHash)) {
-			if (!$iParamHash['topic_id']) {
-				$topicId = $this->mDb->GenID('article_topics_id_seq');
-			} else {
-				$topicId = $this->mTopicId;
-			}
+			$topicId = ( !$iParamHash['topic_id'] ) ? $this->mDb->GenID( 'article_topics_id_seq' ) : $this->mTopicId;
 
 			if( !empty( $_FILES['upload'] ) && $_FILES['upload']['tmp_name'] ) {
-				$checkFunc = liberty_get_function( 'can_thumbnail' );
+				$checkFunc = \Bitweaver\Liberty\liberty_get_function( 'can_thumbnail' );
 				if( $checkFunc( $_FILES['upload']['type'] )) {
 					$fileHash = $_FILES['upload'];
 					$fileHash['dest_branch'] = $this->getTopicImageBaseUrl( $topicId );
 					$fileHash['source_file'] = $fileHash['tmp_name'];
-					liberty_clear_thumbnails( $fileHash );
-					liberty_generate_thumbnails( $fileHash );
+					\Bitweaver\Liberty\liberty_clear_thumbnails( $fileHash );
+					\Bitweaver\Liberty\liberty_generate_thumbnails( $fileHash );
 					$iParamHash['has_topic_image'] = 'y';
 				} else {
-					$this->mErrors = tra( "The file you uploaded doesn't appear to be a valid image. The reported mime type is" ).": ".$_FILES['upload']['type'];
+					$this->mErrors = KernelTools::tra( "The file you uploaded doesn't appear to be a valid image. The reported mime type is" ).": ".$_FILES['upload']['type'];
 				}
 			}
 
@@ -145,17 +133,18 @@ class BitArticleTopic extends BitBase {
 	* Work out the path to the image for this article
 	* @param $pTopicId id of the article we need the image path for
 	* @param $pBasePathOnly bool TRUE / FALSE - specify whether you want full path or just base path
-	* @return path on success, FALSE on failure
+	* @return string on success, FALSE on failure
 	* @access public
 	**/
-	function getTopicImageBaseUrl( $pTopicId = NULL ) {
+	public function getTopicImageBaseUrl($pTopicId = NULL)
+	{
 		$ret = FALSE;
-		if( !@BitBase::verifyId( $pTopicId ) && $this->isValid() ) {
+		if ( !@BitBase::verifyId( $pTopicId ) && $this->isValid() ) {
 			$pTopicId = $this->mTopicId;
 		}
 
 		if( @BitBase::verifyId( $pTopicId )) {
-			$ret = LibertyMime::getStorageUrl( 'topics/'.$pTopicId );
+			$ret = \Bitweaver\Liberty\liberty_mime_get_storage_branch( 'topics/'.$pTopicId );
 		}
 		return $ret;
 	}
@@ -165,22 +154,32 @@ class BitArticleTopic extends BitBase {
 	 *
 	 * @param numeric $pTopicId Topic ID of topic in question
 	 * @access public
-	 * @return Path to thumbnail, FALSE on failure
+	 * @return string Path to thumbnail, FALSE on failure
 	 */
-	public static function getTopicImageThumbUrl( $pTopicId ) {
+	public function getTopicImageThumbUrl($pTopicId = NULL)
+	{
+		global $gBitSystem;
 		$ret = FALSE;
-		if( @BitBase::verifyId( $pTopicId )) {
-			$ret = STORAGE_PKG_URL.ARTICLES_PKG_NAME.'/topic_'.$pTopicId.'.jpg';
+		if ( !@BitBase::verifyId( $pTopicId ) && $this->isValid() ) {
+			$pTopicId = $this->mTopicId;
+		}
+
+		if ( @BitBase::verifyId( $pTopicId )) {
+			$ret = \Bitweaver\Liberty\liberty_fetch_thumbnail_url( [
+				'source_file'   => BitArticleTopic::getTopicImageBaseUrl( $pTopicId ),
+				'default_image' => $gBitSystem->getConfig( 'articles_image_size', 'small' ),
+			]);
 		}
 		return $ret;
 	}
 
-	public static function getTopicList( $pOptionHash=NULL ) {
+	public static function getTopicList($pOptionHash=NULL)
+	{
 		global $gBitSystem;
 
 		$where = '';
-		$bindVars = array();
-		if( !empty( $pOptionHash['active_topic'] ) ) {
+		$bindVars = [];
+		if ( !empty( $pOptionHash['active_topic'] ) ) {
 			$where = " WHERE artt.`active_topic` = 'y' ";
 		}
 		if ( !empty(  $pOptionHash['topic_name'] ) ) {
@@ -194,12 +193,12 @@ class BitArticleTopic extends BitBase {
 
 		$result = $gBitSystem->mDb->query( $query, $bindVars );
 
-        $ret = array();
+        $ret = [];
 
-        while( $res = $result->fetchRow() ) {
-			$res["num_articles"] = $gBitSystem->mDb->getOne( "SELECT COUNT(*) FROM `".BIT_DB_PREFIX."articles` WHERE `topic_id`= ?", array( $res["topic_id"] ) );
-			if( empty( $res['topic_image_url'] ) && $res['has_topic_image'] == 'y' ) {
-				$res['topic_image_url'] = static::getTopicImageStorageUrl( $res['topic_id'] );
+        while ( $res = $result->fetchRow() ) {
+			$res["num_articles"] = $gBitSystem->mDb->getOne( "SELECT COUNT(*) FROM `".BIT_DB_PREFIX."articles` WHERE `topic_id`= ?", [ $res["topic_id"] ] );
+			if ( empty( $res['topic_image_url'] ) && $res['has_topic_image'] == 'y' ) {
+				$res['topic_image_url'] = BitArticleTopic::getTopicImageStorageUrl( $res['topic_id'] );
 			}
 
             $ret[] = $res;
@@ -208,9 +207,10 @@ class BitArticleTopic extends BitBase {
         return $ret;
     }
 
-	function removeTopicImage() {
-		if( $this->mTopicId ) {
-			if( file_exists($this->getTopicImageStoragePath() ) ) {
+	public function removeTopicImage()
+	{
+		if ($this->mTopicId) {
+			if ( file_exists($this->getTopicImageStoragePath() ) ) {
 				@unlink( $this->getTopicImageStoragePath() );
 			}
 			$sql = "UPDATE `".BIT_DB_PREFIX."article_topics` SET `has_topic_image` = 'n' WHERE `topic_id` = ?";
@@ -219,29 +219,33 @@ class BitArticleTopic extends BitBase {
 		}
 	}
 
-	function activateTopic() {
+	public function activateTopic()
+	{
 		$this->setActivation(TRUE);
 	}
 
-	function deactivateTopic() {
+	public function deactivateTopic()
+	{
 		$this->setActivation(FALSE);
 	}
 
-	function setActivation($iIsActive = FALSE) {
+	public function setActivation($iIsActive = FALSE)
+	{
 		$sql = "UPDATE `".BIT_DB_PREFIX."article_topics` SET `active_topic` = '".($iIsActive ? 'y' : 'n')."' WHERE `topic_id` = ?";
 		$rs = $this->mDb->query($sql, array($this->mTopicId));
 		$this->mInfo['active_topic'] = ($iIsActive ? 'y' : 'n');
 	}
 
-	function getTopicArticles() {
+	public function getTopicArticles()
+	{
 		if (!$this->mTopicId) {
-			return NULL;
+			return [];
 		}
 
 		$sql = "SELECT `article_id` FROM `".BIT_DB_PREFIX."articles` WHERE `topic_id` = ?";
-		$rs = $this->mDb->query($sql, array($this->mTopicId));
+		$rs = $this->mDb->query($sql, [ $this->mTopicId ]);
 
-		$ret = array();
+		$ret = [];
 		while ($row = $rs->fetchRow()) {
 			$tmpArticle = new BitArticle($row['article_id']);
 			$tmpArticle->load();
@@ -249,7 +253,8 @@ class BitArticleTopic extends BitBase {
 		}
 	}
 
-	function removeTopic($iRemoveArticles = FALSE) {
+	public function removeTopic($iRemoveArticles = FALSE)
+	{
 		if (!$this->mTopicId) {
 			return NULL;
 		}
@@ -263,11 +268,11 @@ class BitArticleTopic extends BitBase {
 			}
 		} else {
 			$sql = "UPDATE `".BIT_DB_PREFIX."articles` SET `topic_id` = ? WHERE `topic_id` = ?";
-			$rs = $this->mDb->query($sql, array(NULL, $this->mTopicId));
+			$rs = $this->mDb->query($sql, [ null, $this->mTopicId ]);
 		}
 
 		$sql = "DELETE FROM `".BIT_DB_PREFIX."article_topics` WHERE `topic_id` = ?";
-		$rs = $this->mDb->query($sql, array($this->mTopicId));
+		$rs = $this->mDb->query($sql, [ $this->mTopicId ]);
 	}
 
 
@@ -284,14 +289,15 @@ class BitArticleTopic extends BitBase {
 	 *
 	 * @param array $pTopicId article id
 	 * @access public
-	 * @return TRUE on success, FALSE on failure
+	 * @return string on success
 	 */
-	function getTopicImageStorageName( $pTopicId = NULL ) {
-		if( !@BitBase::verifyId( $pTopicId ) ) {
-			if( $this->isValid() ) {
+	public function getTopicImageStorageName($pTopicId = NULL)
+	{
+		if ( !@BitBase::verifyId( $pTopicId ) ) {
+			if ( $this->isValid() ) {
 				$pTopicId = $this->mTopicId;
 			} else {
-				return NULL;
+				return '';
 			}
 		}
 
@@ -303,28 +309,29 @@ class BitArticleTopic extends BitBase {
 	* Work out the path to the image for this article
 	* @param $pTopicId id of the article we need the image path for
 	* @param $pBasePathOnly bool TRUE / FALSE - specify whether you want full path or just base path
-	* @return path on success, FALSE on failure
+	* @return string path on success, FALSE on failure
 	* @access public
 	**/
-	function getTopicImageStoragePath( $pTopicId = NULL, $pBasePathOnly = FALSE ) {
-		$path = static::getArticleImageStoragePath( NULL, TRUE );
+	public function getTopicImageStoragePath($pTopicId = NULL, $pBasePathOnly = FALSE)
+	{
+		$path = BitArticleTopic::getArticleImageStoragePath( NULL, TRUE );
 
-		if( $pBasePathOnly ) {
+		if ($pBasePathOnly) {
 			return $path;
 		}
 
-		if( !@BitBase::verifyId( $pTopicId ) ) {
+		if ( !@BitBase::verifyId( $pTopicId ) ) {
 			if( $this->isValid() ) {
 				$pTopicId = $this->mTopicId;
 			} else {
-				return NULL;
+				return '';
 			}
 		}
 
-		if( !empty( $pTopicId ) ) {
-			return $path.static::getTopicImageStorageName( $pTopicId );
+		if ( !empty( $pTopicId ) ) {
+			return $path.BitArticleTopic::getTopicImageStorageName( $pTopicId );
 		} else {
-			return FALSE;
+			return '';
 		}
 	}
 
@@ -332,22 +339,31 @@ class BitArticleTopic extends BitBase {
 	* Work out the URL to the image for this article
 	* @param $pTopicId id of the article we need the image path for
 	* @param $pBasePathOnly bool TRUE / FALSE - specify whether you want full path or just base path
-	* @return URL on success, FALSE on failure
+	* @return string URL on success, FALSE on failure
 	* @access public
 	**/
-	public static function getTopicImageStorageUrl( $pTopicId, $pBasePathOnly = FALSE, $pForceRefresh = FALSE ) {
+	public function getTopicImageStorageUrl($pTopicId = NULL, $pBasePathOnly = FALSE, $pForceRefresh = FALSE)
+	{
 		global $gBitSystem;
-		$ret = FALSE;
+		$ret = false;
 
 		// first we check to see if this is a new type thumbnail. if that fails we'll use the old method
-		if( !( $ret = static::getTopicImageThumbUrl( $pTopicId ))) {
-			$url = static::getArticleImageStorageUrl( $this->mArticleId, NULL, TRUE );
-			if( $pBasePathOnly ) {
+		if ( !( $ret = BitArticleTopic::getTopicImageThumbUrl( $pTopicId ))) {
+			$url = BitArticleTopic::getArticleImageStorageUrl( NULL, TRUE );
+			if ($pBasePathOnly) {
 				return $url;
 			}
 
-			if( is_file( static::getTopicImageStoragePath( NULL, TRUE ).static::getTopicImageStorageName( $pTopicId ))) {
-				$ret = $url.static::getTopicImageStorageName( $pTopicId ).( $pForceRefresh ? "?".$gBitSystem->getUTCTime() : '' );
+			if ( !@BitBase::verifyId( $pTopicId ) ) {
+				if ( $this->isValid() ) {
+					$pTopicId = $this->mTopicId;
+				} else {
+					return false;
+				}
+			}
+
+			if ( is_file( BitArticleTopic::getTopicImageStoragePath( NULL, TRUE ).BitArticleTopic::getTopicImageStorageName( $pTopicId ))) {
+				$ret = $url.BitArticleTopic::getTopicImageStorageName( $pTopicId ).( $pForceRefresh ? "?".$gBitSystem->getUTCTime() : '' );
 			}
 		}
 
@@ -373,30 +389,36 @@ class BitArticleTopic extends BitBase {
 	 *
 	 * @param array $pArticleId article id
 	 * @access public
-	 * @return TRUE on success, FALSE on failure
+	 * @return string on success, FALSE on failure
 	 */
-	public function getArticleImageStorageName( $pArticleId ) {
-		$ret = FALSE;
-		if( BitBase::verifyId( $pArticleId ) ) {
-			$ret = "article_$pArticleId.jpg";
+	public function getArticleImageStorageName($pArticleId = NULL)
+	{
+		if ( !@BitBase::verifyId( $pArticleId ) ) {
+			if ( $this->isValid() ) {
+				$pArticleId = $this->mArticleId;
+			} else {
+				return NULL;
+			}
 		}
-		return $ret;
+
+		return "article_$pArticleId.jpg";
 	}
 
 	/**
 	* Work out the path to the image for this article
 	* @param $pArticleId id of the article we need the image path for
 	* @param $pBasePathOnly bool TRUE / FALSE - specify whether you want full path or just base path
-	* @return path on success, FALSE on failure
+	* @return string path on success, FALSE on failure
 	* @access public
 	**/
-	function getArticleImageStoragePath( $pArticleId = NULL, $pBasePathOnly = FALSE ) {
+	public function getArticleImageStoragePath($pArticleId = NULL, $pBasePathOnly = FALSE)
+	{
 		$path = STORAGE_PKG_PATH.ARTICLES_PKG_NAME.'/';
-		if( !is_dir( $path ) ) {
-			mkdir_p( $path );
+		if ( !is_dir( $path ) ) {
+			KernelTools::mkdir_p( $path );
 		}
 
-		if( $pBasePathOnly ) {
+		if ($pBasePathOnly) {
 			return $path;
 		}
 
@@ -408,8 +430,8 @@ class BitArticleTopic extends BitBase {
 			}
 		}
 
-		if( !empty( $pArticleId ) ) {
-			return $path.static::getArticleImageStorageName( $pArticleId );
+		if ( !empty( $pArticleId ) ) {
+			return $path.BitArticleTopic::getArticleImageStorageName( $pArticleId );
 		} else {
 			return FALSE;
 		}
@@ -419,24 +441,29 @@ class BitArticleTopic extends BitBase {
 	* Work out the URL to the image for this article
 	* @param $pArticleId id of the article we need the image path for
 	* @param $pBasePathOnly bool TRUE / FALSE - specify whether you want full path or just base path
-	* @return URL on success, FALSE on failure
+	* @return string URL on success, FALSE on failure
 	* @access public
 	**/
-	public static function getArticleImageStorageUrl( $pArticleId = NULL, $pBasePathOnly = FALSE, $pForceRefresh = FALSE ) {
+	public function getArticleImageStorageUrl($pArticleId = NULL, $pBasePathOnly = FALSE, $pForceRefresh = FALSE)
+	{
 		global $gBitSystem;
-
-		$ret = FALSE;
 		$url = STORAGE_PKG_URL.ARTICLES_PKG_NAME.'/';
-		if( $pBasePathOnly ) {
+		if ($pBasePathOnly) {
 			return $url;
 		}
 
-		if( BitBase::verifyId( $pArticleId ) ) {
-			if( is_file( static::getArticleImageStoragePath( NULL, TRUE ).static::getArticleImageStorageName( $pArticleId ) ) ) {
-				$ret = $url.static::getArticleImageStorageName( $pArticleId ).( $pForceRefresh ? "?".$gBitSystem->getUTCTime() : '' );
+		if( !@BitBase::verifyId( $pArticleId ) ) {
+			if( $this->isValid() ) {
+				$pArticleId = $this->mArticleId;
+			} else {
+				return NULL;
 			}
 		}
-		return $ret;
+
+		if ( is_file( BitArticleTopic::getArticleImageStoragePath( NULL, TRUE ).BitArticleTopic::getArticleImageStorageName( $pArticleId ) ) ) {
+			return $url.BitArticleTopic::getArticleImageStorageName( $pArticleId ).( $pForceRefresh ? "?".$gBitSystem->getUTCTime() : '' );
+		} else {
+			return FALSE;
+		}
 	}
 }
-

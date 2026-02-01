@@ -20,24 +20,27 @@
 // +----------------------------------------------------------------------+
 // $Id$
 
+use Bitweaver\Articles\BitArticle;
+use Bitweaver\KernelTools;
+
 /**
  * definitions
  */
 global $gBitSystem, $gBitSmarty;
 define( 'PLUGIN_GUID_DATAARTICLES', 'dataarticles' );
 global $gLibertySystem;
-$pluginParams = array (
-	'tag' => 'ARTICLES',
-	'auto_activate' => FALSE,
-	'requires_pair' => FALSE,
+$pluginParams = [
+	'tag'           => 'ARTICLES',
+	'auto_activate' => false,
+	'requires_pair' => false,
 	'load_function' => 'data_articles',
 	'help_function' => 'data_articles_help',
-	'title' => 'Articles',
-	'help_page' => 'DataPluginArticles',
-	'description' => tra( "This plugin will display several Articles." ),
-	'syntax' => "{ARTICLES max= topic= type= }",
-	'plugin_type' => DATA_PLUGIN
-);
+	'title'         => 'Articles',
+	'help_page'     => 'DataPluginArticles',
+	'description'   => KernelTools::tra( "This plugin will display several Articles." ),
+	'syntax'        => "{ARTICLES max= topic= type= }",
+	'plugin_type'   => DATA_PLUGIN,
+];
 $gLibertySystem->registerPlugin( PLUGIN_GUID_DATAARTICLES, $pluginParams );
 $gLibertySystem->registerDataTag( $pluginParams['tag'], PLUGIN_GUID_DATAARTICLES );
 
@@ -45,35 +48,33 @@ $gLibertySystem->registerDataTag( $pluginParams['tag'], PLUGIN_GUID_DATAARTICLES
 function data_articles_help()
 {
 	$help =
-		'<table class="data help">'
-			.'<tr>'
-				.'<th>' . tra( "Key" ) . '</th>'
-				.'<th>' . tra( "Type" ) . '</th>'
-				.'<th>' . tra( "Comments" ) . '</th>'
+		"<table class=\"data help\"><tr><th>" . KernelTools::tra( "Key" ) . '</th>'
+				.'<th>' . KernelTools::tra( "Type" ) . '</th>'
+				.'<th>' . KernelTools::tra( "Comments" ) . '</th>'
 			.'</tr>'
 			.'<tr class="odd">'
 				.'<td>max</td>'
-				.'<td>' . tra( "numeric") . '<br />' . tra("(optional)") . '</td>'
-				.'<td>' . tra( "The number of Articles to be displayed. (Default = 3)") . '</td>'
+				.'<td>' . KernelTools::tra( "numeric") . '<br />' . KernelTools::tra("(optional)") . '</td>'
+				.'<td>' . KernelTools::tra( "The number of Articles to be displayed. (Default = 3)") . '</td>'
 			.'</tr>'
 			.'<tr class="even">'
 				.'<td>topic</td>'
-				.'<td>' . tra( "topic name") . '<br />' . tra("(optional)") . '</td>'
-				.'<td>' . tra( "Filters the Articles so that only the Topic specified is displayed") . '</td>'
+				.'<td>' . KernelTools::tra( "topic name") . '<br />' . KernelTools::tra("(optional)") . '</td>'
+				.'<td>' . KernelTools::tra( "Filters the Articles so that only the Topic specified is displayed") . '</td>'
 			.'</tr>'
 			.'<tr class="odd">'
 				.'<td>type</td>'
-				.'<td>' . tra( "type name") . '<br />' . tra("(optional)") . '</td>'
-				.'<td>' . tra( "Filters the Articles so that only the Type specified is displayed") . '</td>'
+				.'<td>' . KernelTools::tra( "type name") . '<br />' . KernelTools::tra("(optional)") . '</td>'
+				.'<td>' . KernelTools::tra( "Filters the Articles so that only the Type specified is displayed") . '</td>'
 			.'</tr>'
 			.'<tr class="even">'
 				.'<td>format</td>'
-				.'<td>' . tra( "string") . '<br />' . tra("(optional)") . '</td>'
-				.'<td>' . tra( "Specify format for article display - options: full, list (default)") . '</td>'
+				.'<td>' . KernelTools::tra( "string") . '<br />' . KernelTools::tra("(optional)") . '</td>'
+				.'<td>' . KernelTools::tra( "Specify format for article display - options: full, list (default)") . '</td>'
 			.'</tr>'
 		.'</table>'
-		. tra("Example: ") . "{ARTICLES max=5 topic='some_topic'}<br />"
-		. tra("Example: ") . "{ARTICLES max=5 type='some_type'}";
+		. KernelTools::tra("Example: ") . "{ARTICLES max=5 topic='some_topic'}<br />"
+		. KernelTools::tra("Example: ") . "{ARTICLES max=5 type='some_type'}";
 	return $help;
 }
 
@@ -84,17 +85,12 @@ function data_articles($data, $params) { // No change in the parameters with Cly
 		// The next 2 lines allow access to the $pluginParams given above and may be removed when no longer needed
 		$pluginParams = $gLibertySystem->mPlugins[PLUGIN_GUID_DATAARTICLES];
 
-		require_once( ARTICLES_PKG_CLASS_PATH.'BitArticle.php');
 		require_once( LIBERTY_PKG_INCLUDE_PATH.'lookup_content_inc.php' );
 
 		$module_params = $params;
 		$articlesObject = new BitArticle();
 		$stati = array( 'pending', 'approved' );
-		if( !empty( $module_params['status'] ) && in_array( $module_params['status'], $stati ) ) {
-			$status_id = constant( 'ARTICLE_STATUS_'.strtoupper( $module_params['status'] ) );
-		} else {
-			$status_id = ARTICLE_STATUS_APPROVED;
-		}
+		$status_id = ( !empty( $module_params['status'] ) && in_array( $module_params['status'], $stati ) ) ? constant( 'ARTICLE_STATUS_' . strtoupper( $module_params['status'] ) ) : ARTICLE_STATUS_APPROVED;
 
 		$sortOptions = array(
 			"last_modified_asc",
@@ -103,11 +99,7 @@ function data_articles($data, $params) { // No change in the parameters with Cly
 			"created_desc",
 			"random",
 		);
-		if( !empty( $module_params['sort_mode'] ) && in_array( $module_params['sort_mode'], $sortOptions ) ) {
-			$sort_mode = $module_params['sort_mode'];
-		} else {
-			$sort_mode = 'last_modified_desc';
-		}
+		$sort_mode = ( !empty( $module_params['sort_mode'] ) && in_array( $module_params['sort_mode'], $sortOptions ) ) ? $module_params['sort_mode'] : 'last_modified_desc';
 
 		$getHash = Array();
 		$getHash['status_id']     = $status_id;
@@ -134,7 +126,7 @@ function data_articles($data, $params) { // No change in the parameters with Cly
 					$display_result .= $gBitSmarty->fetch( 'bitpackage:articles/article_display.tpl' );
 				}
 				$display_result .= '</div>';
-				$display_result = eregi_replace( "\n", "", $display_result );
+				$display_result = preg_replace( "/\\\\n/", '', $display_result );
 				break;
 			case 'list':
 			default:

@@ -8,18 +8,19 @@
 /**
  * Initialization
  */
-$gBitSmarty->assignByRef( 'article', $gContent->mInfo );
+ use Bitweaver\Articles\BitArticleTopic;
+$gBitSmarty->assign( 'article', $gContent->mInfo );
 
 // get all the services that want to display something on this page
-$displayHash = array( 'perm_name' => 'p_articles_read' );
+$displayHash = [ 'perm_name' => 'p_articles_read' ];
 $gContent->invokeServices( 'content_display_function', $displayHash );
 
 $topics = BitArticleTopic::getTopicList();
-$gBitSmarty->assignByRef( 'topics', $topics );
+$gBitSmarty->assign( 'topics', $topics );
 
 // Comments engine!
 if( @$gContent->mInfo['allow_comments'] == 'y' ) {
-	$comments_vars = Array( 'article' );
+	$comments_vars = [ 'article' ];
 	$comments_prefix_var='article:';
 	$comments_object_var='article';
 	$commentsParentId = $gContent->mContentId;
@@ -28,4 +29,4 @@ if( @$gContent->mInfo['allow_comments'] == 'y' ) {
 }
 
 // Display the Index Template
-$gBitSystem->display( 'bitpackage:articles/read_article.tpl', @$gContent->mInfo['title'] , array( 'display_mode' => 'display' ));
+$gBitSystem->display( 'bitpackage:articles/read_article.tpl', @$gContent->mInfo['title'] , [ 'display_mode' => 'display' ]);

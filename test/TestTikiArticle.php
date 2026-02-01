@@ -1,6 +1,6 @@
 <?php
 require_once '../../kernel/includes/setup_inc.php';
-require_once(ARTICLES_PKG_CLASS_PATH.'BitArticle.php');
+use Bitweaver\Articles\BitArticle;
 
 class TestBitArticle extends Test
 {

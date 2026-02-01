@@ -11,8 +11,9 @@
 /**
  * Required setup
  */
-require_once( KERNEL_PKG_CLASS_PATH.'BitBase.php' );
-require_once( ARTICLES_PKG_CLASS_PATH.'BitArticle.php' );
+namespace Bitweaver\Articles;
+use Bitweaver\BitBase;
+use Bitweaver\KernelTools;
 
 /**
  * @package articles
@@ -20,6 +21,7 @@ require_once( ARTICLES_PKG_CLASS_PATH.'BitArticle.php' );
 class BitArticleType extends BitBase
 {
 	public $mTypeId;
+	public $mTopicId;
 
 	public function __construct($iTypeId = NULL)
 	{
@@ -46,8 +48,8 @@ class BitArticleType extends BitBase
 		if ($this->mTypeId) {
 			$sql = "SELECT * FROM `".BIT_DB_PREFIX."article_types` WHERE `article_type_id` = ?";
 
-			if( $ret = $this->mDb->getRow( $sql, array( $this->mTypeId ) ) ) {
-				$ret['num_articles'] = $this->mDb->getOne('SELECT COUNT(*) FROM `'.BIT_DB_PREFIX.'articles` WHERE `article_type_id` = ?', array($ret['article_type_id']));
+			if( $ret = $this->mDb->getRow( $sql, [ $this->mTypeId ] ) ) {
+				$ret['num_articles'] = $this->mDb->getOne('SELECT COUNT(*) FROM `'.BIT_DB_PREFIX.'articles` WHERE `article_type_id` = ?', [ $ret['article_type_id'] ] );
 			}
 		}
 		$this->mInfo = $ret;
@@ -86,7 +88,7 @@ class BitArticleType extends BitBase
 		} else {
 			// Was an acceptable name given?
 			if (empty($iParamHash['type_name']) || ($iParamHash['type_name'] == '')) {
-				$this->mErrors['type_name'] = tra("Invalid or blank article type name supplied");
+				$this->mErrors['type_name'] = KernelTools::tra("Invalid or blank article type name supplied");
 			} else {
 				$cleanHash['type_name'] = $iParamHash['type_name'];
 			}
@@ -102,18 +104,10 @@ class BitArticleType extends BitBase
 		global $gBitUser;
 
 		if ($this->verify($iParamHash)) {
-			if (!$iParamHash['article_type_id']) {
-				if (empty($this->mTopicId)) {
-					$typeId = $this->mDb->GenID('article_types_id_seq');
-				} else {
-					$typeId = $this->mTopicId;
-				}
-			} else {
-				$typeId = $iParamHash['article_type_id'];
-			}
+			$typeId = ( !$iParamHash['article_type_id'] ) ? ( empty( $this->mTopicId ) ) ? $this->mDb->GenID( 'article_types_id_seq' ) : $this->mTopicId : $iParamHash['article_type_id'];
 
 			if ($iParamHash['article_type_id']) {
-				$this->mDb->associateUpdate(BIT_DB_PREFIX."article_types", $iParamHash, array( 'article_type_id'=> $iParamHash['article_type_id']));
+				$this->mDb->associateUpdate(BIT_DB_PREFIX."article_types", $iParamHash, [ 'article_type_id'=> $iParamHash['article_type_id'] ] );
 			} else {
 				$iParamHash['article_type_id'] = $typeId;
 				$this->mDb->associateInsert(BIT_DB_PREFIX."article_types", $iParamHash);
@@ -126,7 +120,7 @@ class BitArticleType extends BitBase
 	{
 		if (!$iTypeId) {
 		 	if (!$this->mTypeId) {
-				$this->mErrors[] = tra("Invalid type id given");
+				$this->mErrors[] = KernelTools::tra("Invalid type id given");
 				return NULL;
 			} else {
 				$iTypeId = $this->mTypeId;
@@ -136,7 +130,7 @@ class BitArticleType extends BitBase
 		}
 
 		$sql = "DELETE FROM `".BIT_DB_PREFIX."article_types` WHERE `article_type_id` = ?";
-		$rs = $this->mDb->query($sql, array($iTypeId));
+		$rs = $this->mDb->query($sql, [$iTypeId]);
 	}
 
 	public static function getTypeList()
@@ -144,11 +138,11 @@ class BitArticleType extends BitBase
 		global $gBitSystem;
 
 		$query = "SELECT * FROM `" . BIT_DB_PREFIX . "article_types`";
-		$result = $gBitSystem->mDb->query( $query, array() );
-        $ret = array();
+		$result = $gBitSystem->mDb->query( $query, [] );
+        $ret = [];
 
         while ( $res = $result->fetchRow() ) {
-			$res['article_cnt'] = $gBitSystem->mDb->getOne( "select count(*) from `" . BIT_DB_PREFIX . "articles` where `article_type_id` = ?", array( $res['article_type_id'] ) );
+			$res['article_cnt'] = $gBitSystem->mDb->getOne( "select count(*) from `" . BIT_DB_PREFIX . "articles` where `article_type_id` = ?", [ $res['article_type_id'] ] );
             $ret[] = $res;
         }
 

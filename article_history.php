@@ -17,26 +17,27 @@
  * required setup
  */
 require_once '../kernel/includes/setup_inc.php';
-require_once( ARTICLES_PKG_CLASS_PATH.'BitArticle.php' );
+use Bitweaver\Articles\BitArticle;
+use Bitweaver\KernelTools;
 
 $gBitSystem->verifyPackage( 'articles' );
 $gBitSystem->verifyPermission( 'p_articles_read' );
 $gBitSystem->verifyPermission( 'p_articles_read_history' );
 
 if( !isset( $_REQUEST["article_id"] ) ) {
-	$gBitSystem->fatalError( tra( "No article indicated" ));
+	$gBitSystem->fatalError( KernelTools::tra( "No article indicated" ));
 }
 
 include_once( ARTICLES_PKG_INCLUDE_PATH.'lookup_article_inc.php' );
 
 //vd($gContent->mPageId);vd($gContent->mInfo);
 if( !$gContent->isValid() || empty( $gContent->mInfo ) ) {
-	$gBitSystem->fatalError( tra( "Unknown article" ));
+	$gBitSystem->fatalError( KernelTools::tra( "Unknown article" ));
 }
 
 // additionally we need to check if this article is a submission and see if user has perms to view it.
 if( $gContent->getField( 'status_id' ) != ARTICLE_STATUS_APPROVED && !( $gContent->hasUserPermission( 'p_articles_update_submission' ) || $gBitUser->isAdmin() ) ) {
-	$gBitSmarty->assign( 'msg', tra( "Permission denied you cannot view this article" ) );
+	$gBitSmarty->assign( 'msg', KernelTools::tra( "Permission denied you cannot view this article" ) );
 	$gBitSystem->display( "error.tpl" , NULL, array( 'display_mode' => 'display' ));
 	die;
 }
@@ -47,8 +48,8 @@ include_once( LIBERTY_PKG_INCLUDE_PATH.'content_history_inc.php' );
 $gBitSmarty->assign( 'page', $page = !empty( $_REQUEST['list_page'] ) ? $_REQUEST['list_page'] : 1 );
 $offset = ( $page - 1 ) * $gBitSystem->getConfig( 'max_records' );
 $history = $gContent->getHistory( NULL, NULL, $offset, $gBitSystem->getConfig( 'max_records' ) );
-$gBitSmarty->assignByRef( 'data', $history['data'] );
-$gBitSmarty->assignByRef( 'listInfo', $history['listInfo'] );
+$gBitSmarty->assign( 'data', $history['data'] );
+$gBitSmarty->assign( 'listInfo', $history['listInfo'] );
 
 //vd($gContent->getHistoryCount());
 
@@ -57,5 +58,5 @@ $numPages = ceil( $gContent->getHistoryCount() / $gBitSystem->getConfig('max_rec
 $gBitSmarty->assign( 'numPages', $numPages );
 
 // Display the template
-$gBitSmarty->assignByRef( 'gContent', $gContent );
+$gBitSmarty->assign( 'gContent', $gContent );
 $gBitSystem->display( 'bitpackage:articles/article_history.tpl', NULL, array( 'display_mode' => 'display' ));

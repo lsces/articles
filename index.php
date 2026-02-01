@@ -4,24 +4,28 @@
 // All Rights Reserved. See below for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See http://www.gnu.org/copyleft/lesser.html for details.
 
-// Initialization
+/**
+ * required setup
+ */
+namespace Bitweaver\Articles;
+use Bitweaver\KernelTools;
+
 require_once '../kernel/includes/setup_inc.php';
 
 // Is package installed and enabled
 $gBitSystem->verifyPackage( 'articles' );
-require_once( ARTICLES_PKG_CLASS_PATH.'BitArticle.php' );
 
 // Now check permissions to access this page
 $gBitSystem->verifyPermission( 'p_articles_read' );
 
 if ( !empty( $_REQUEST['article_id'] ) ) {
-	$param = array ( 'article_id' => (int) $_REQUEST['article_id'] );
-	bit_redirect( BitArticle::getDisplayUrlFromHash( $param ) );
+	$param = [ 'article_id' => (int) $_REQUEST['article_id'] ];
+	KernelTools::bit_redirect( BitArticle::getDisplayUrlFromHash( $param ) );
 }
 
 // Display the template
-$gDefaultCenter = 'bitpackage:articles/center_display_articles.tpl';
-$gBitSmarty->assignByRef( 'gDefaultCenter', $gDefaultCenter );
+$gDefaultCenter = 'bitpackage:articles/center_list_articles.tpl';
+$gBitSmarty->assign( 'gDefaultCenter', $gDefaultCenter );
 
 // Display the template
-$gBitSystem->display( 'bitpackage:kernel/dynamic.tpl', tra( 'Articles' ) , array( 'display_mode' => 'display' ));
+$gBitSystem->display( 'bitpackage:kernel/dynamic.tpl', KernelTools::tra( 'Articles' ) , array( 'display_mode' => 'display' ));

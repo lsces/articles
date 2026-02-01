@@ -1,8 +1,10 @@
 <?php
+
 // $Header$
 require_once '../../kernel/includes/setup_inc.php';
+use Bitweaver\Articles\BitArticleTopic;
+use Bitweaver\KernelTools;
 
-include_once( ARTICLES_PKG_CLASS_PATH.'BitArticle.php' );
 include_once( ARTICLES_PKG_INCLUDE_PATH.'lookup_article_topic_inc.php' );
 
 // Is package installed and enabled
@@ -12,7 +14,7 @@ $gBitSystem->verifyPermission( 'p_articles_admin' );
 if( isset( $_REQUEST["fSubmitAddTopic"] ) ) {
 	$gContent->storeTopic( $_REQUEST );
 	if ( !empty( $gContent->mErrors ) ) {
-		$gBitSmarty->assignByRef('errors', $gContent->mErrors );
+		$gBitSmarty->assign('errors', $gContent->mErrors );
 	}
 } elseif( !empty( $_REQUEST['fActivateTopic'] )&& $gContent ) {
 	$gContent->activateTopic();
@@ -27,4 +29,4 @@ if( isset( $_REQUEST["fSubmitAddTopic"] ) ) {
 $topics = BitArticleTopic::getTopicList();
 $gBitSmarty->assign( 'topics', $topics );
 
-$gBitSystem->display( 'bitpackage:articles/admin_topics.tpl', tra( 'Edit Topics' ) , array( 'display_mode' => 'admin' ));
+$gBitSystem->display( 'bitpackage:articles/admin_topics.tpl', KernelTools::tra( 'Edit Topics' ) , [ 'display_mode' => 'admin' ]);

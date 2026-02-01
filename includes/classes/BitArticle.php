@@ -21,10 +21,13 @@
 /**
  * Required setup
  */
-require_once( ARTICLES_PKG_CLASS_PATH.'BitArticleTopic.php' );
-require_once( ARTICLES_PKG_CLASS_PATH.'BitArticleType.php' );
-require_once( LIBERTY_PKG_CLASS_PATH.'LibertyMime.php' );
-require_once( LIBERTY_PKG_CLASS_PATH.'LibertyComment.php' );
+namespace Bitweaver\Articles;
+use Bitweaver\BitBase;
+use Bitweaver\BitDate;
+use Bitweaver\Liberty\LibertyContent;
+use Bitweaver\Liberty\LibertyMime;
+use Bitweaver\Liberty\LibertyComment;
+use function in_array;
 
 define( 'BITARTICLE_CONTENT_TYPE_GUID', 'bitarticle' );
 
@@ -39,6 +42,7 @@ class BitArticle extends LibertyMime
 	public $mArticleId;
 	public $mTypeId;
 	public $mTopicId;
+	public $mDate;
 
 	/**
 	* Initiate the articles class
@@ -55,7 +59,7 @@ class BitArticle extends LibertyMime
 				'content_name' => 'Article',
 				'handler_class' => 'BitArticle',
 				'handler_package' => 'articles',
-				'handler_file' => 'includes/classes/BitArticle.php',
+				'handler_file' => 'BitArticle.php',
 				'maintainer_url' => 'http://www.bitweaver.org'
 		));
 		$this->mContentId = $pContentId;
@@ -133,7 +137,7 @@ class BitArticle extends LibertyMime
 					$this->mInfo['primary_attachment'] = &$this->mStorage[$this->mInfo['primary_attachment_id']];
 				}
 
-				$this->mInfo['parsed'] = $this->parseData();
+				$this->parseData();
 			} else {
 				$this->mArticleId = NULL;
 			}
@@ -148,7 +152,7 @@ class BitArticle extends LibertyMime
 	* @return bool TRUE on success, FALSE if store could not occur. If FALSE, $this->mErrors will have reason why
 	* @access public
 	**/
-	public function store(&$pParamHash)
+	public function store(&$pParamHash): bool
 	{
 		global $gBitSystem;
 		$this->StartTrans();
@@ -159,12 +163,7 @@ class BitArticle extends LibertyMime
 				$result = $this->mDb->associateUpdate( $table, $pParamHash['article_store'], array( "article_id" => $this->mArticleId ));
 			} else {
 				$pParamHash['article_store']['content_id'] = $pParamHash['content_id'];
-				if ( isset( $pParamHash['article_id'] )&& is_numeric( $pParamHash['article_id'] ) ) {
-					// if pParamHash['article_id'] is set, someone is requesting a particular article_id. Use with caution!
-					$pParamHash['article_store']['article_id'] = $pParamHash['article_id'];
-				} else {
-					$pParamHash['article_store']['article_id'] = $this->mDb->GenID( 'articles_article_id_seq' );
-				}
+				$pParamHash['article_store']['article_id'] = ( isset( $pParamHash['article_id'] ) && is_numeric( $pParamHash['article_id'] ) ) ? $pParamHash['article_id'] : $this->mDb->GenID( 'articles_article_id_seq' );
 				$this->mArticleId = $pParamHash['article_store']['article_id'];
 				$result = $this->mDb->associateInsert( $table, $pParamHash['article_store'] );
 			}
@@ -176,80 +175,82 @@ class BitArticle extends LibertyMime
 	}
 
 	/**
-	* Make sure the data is safe to store
-	* @param pParamHash be sure to pass by reference in case we need to make modifcations to the hash
-	* @param array pParams reference to hash of values that will be used to store the page, they will be modified where necessary
-	* @return bool TRUE on success, FALSE if verify failed. If FALSE, $this->mErrors will have reason why
-	* @access private
-	**/
-	public function verify(&$pParamHash)
+	 * Make sure the data is safe to store
+	 * @param array pParamHash be sure to pass by reference in case we need to make modifcations to the hash
+	 * @param array pParams reference to hash of values that will be used to store the page, they will be modified where necessary
+	 * @return bool TRUE on success, FALSE if verify failed. If FALSE, $this->mErrors will have reason why
+	 **/
+	public function verify( &$pParamHash ): bool
 	{
 		global $gBitUser, $gBitSystem;
 
 		// make sure we're all loaded up of we have a mArticleId
-		if ( $this->mArticleId && empty( $this->mInfo ) ) {
+		if ($this->mArticleId && empty( $this->mInfo )) {
 			$this->load();
 		}
 
-		if ( @$this->verifyId( $this->mInfo['content_id'] ) ) {
+		if (@$this->verifyId( $this->mInfo['content_id'] )) {
 			$pParamHash['content_id'] = $this->mInfo['content_id'];
 		}
 
 		// It is possible a derived class set this to something different
-		if ( empty( $pParamHash['content_type_guid'] )&& !empty( $this->mContentTypeGuid ) ) {
+		if (empty( $pParamHash['content_type_guid'] ) && !empty( $this->mContentTypeGuid )) {
 			$pParamHash['content_type_guid'] = $this->mContentTypeGuid;
 		}
 
-		if ( @$this->verifyId( $pParamHash['content_id'] ) ) {
+		if (@$this->verifyId( $pParamHash['content_id'] )) {
 			$pParamHash['article_store']['content_id'] = $pParamHash['content_id'];
 		}
 
-		if ( !empty( $pParamHash['author_name'] ) ) {
+		if (!empty( $pParamHash['author_name'] )) {
 			$pParamHash['article_store']['author_name'] = $pParamHash['author_name'];
 		}
 
-		if ( @$this->verifyId( $pParamHash['topic_id'] ) ) {
-			$pParamHash['article_store']['topic_id'] =(int) $pParamHash['topic_id'];
+		if (@$this->verifyId( $pParamHash['topic_id'] )) {
+			$pParamHash['article_store']['topic_id'] = (int) $pParamHash['topic_id'];
 		}
 
-		if ( @$this->verifyId( $pParamHash['article_type_id'] ) ) {
-			$pParamHash['article_store']['article_type_id'] =(int) $pParamHash['article_type_id'];
+		if (@$this->verifyId( $pParamHash['article_type_id'] )) {
+			$pParamHash['article_store']['article_type_id'] = (int) $pParamHash['article_type_id'];
 		}
 
-		if ( !empty( $pParamHash['format_guid'] ) ) {
+		if (!empty( $pParamHash['format_guid'] )) {
 			$pParamHash['content_store']['format_guid'] = $pParamHash['format_guid'];
 		}
 
 		// we do the substr on load. otherwise we need to store the same data twice.
-		if ( !empty( $pParamHash['edit'] ) ) {
+		if (!empty( $pParamHash['edit'] )) {
 			$pParamHash['content_store']['data'] = $pParamHash['edit'];
 		}
 
-		if ( !empty( $pParamHash['rating'] ) ) {
-			$pParamHash['article_store']['rating'] =(int) ( $pParamHash['rating'] );
+		if (!empty( $pParamHash['rating'] )) {
+			$pParamHash['article_store']['rating'] = (int) ( $pParamHash['rating'] );
 		}
 
 		// check for name issues, first truncate length if too long
-		if ( !empty( $pParamHash['title'] ) ) {
-			if ( !$this->isValid() ) {
-				if ( empty( $pParamHash['title'] ) ) {
+		if (!empty( $pParamHash['title'] )) {
+			if (!$this->isValid()) {
+				if (empty( $pParamHash['title'] )) {
 					$this->mErrors['title'] = 'You must specify a title.';
-				} else {
+				}
+				else {
 					$pParamHash['content_store']['title'] = substr( $pParamHash['title'], 0, BIT_CONTENT_MAX_TITLE_LEN );
 				}
-			} else {
-				$pParamHash['content_store']['title'] =( isset( $pParamHash['title'] ))? substr( $pParamHash['title'], 0, BIT_CONTENT_MAX_TITLE_LEN ): '';
 			}
-		} elseif ( empty( $pParamHash['title'] ) ) {
+			else {
+				$pParamHash['content_store']['title'] = ( isset( $pParamHash['title'] ) ) ? substr( $pParamHash['title'], 0, BIT_CONTENT_MAX_TITLE_LEN ) : '';
+			}
+		}
+		elseif (empty( $pParamHash['title'] )) {
 			// no name specified
 			$this->mErrors['title'] = 'You must specify a title';
 		}
 
-		if ( !empty( $pParamHash['publish_Month'] ) ) {
+		if (!empty( $pParamHash['publish_Month'] )) {
 			$dateString = $this->mDate->gmmktime(
 				$pParamHash['publish_Hour'],
 				$pParamHash['publish_Minute'],
-				isset($pParamHash['publish_Second']) ? $pParamHash['publish_Second'] : 0,
+				isset( $pParamHash['publish_Second'] ) ? $pParamHash['publish_Second'] : 0,
 				$pParamHash['publish_Month'],
 				$pParamHash['publish_Day'],
 				$pParamHash['publish_Year']
@@ -260,15 +261,15 @@ class BitArticle extends LibertyMime
 				$pParamHash['publish_date'] = $timestamp;
 			}
 		}
-		if ( !empty( $pParamHash['publish_date'] ) ) {
+		if (!empty( $pParamHash['publish_date'] )) {
 			$pParamHash['article_store']['publish_date'] = $pParamHash['publish_date'];
 		}
 
-		if ( !empty( $pParamHash['expire_Month'] ) ) {
+		if (!empty( $pParamHash['expire_Month'] )) {
 			$dateString = $this->mDate->gmmktime(
 				$pParamHash['expire_Hour'],
 				$pParamHash['expire_Minute'],
-				isset($pParamHash['expire_Second']) ? $pParamHash['expire_Second'] : 0,
+				isset( $pParamHash['expire_Second'] ) ? $pParamHash['expire_Second'] : 0,
 				$pParamHash['expire_Month'],
 				$pParamHash['expire_Day'],
 				$pParamHash['expire_Year']
@@ -279,50 +280,36 @@ class BitArticle extends LibertyMime
 				$pParamHash['expire_date'] = $timestamp;
 			}
 		}
-		if ( !empty( $pParamHash['expire_date'] ) ) {
+		if (!empty( $pParamHash['expire_date'] )) {
 			$pParamHash['article_store']['expire_date'] = $pParamHash['expire_date'];
 		}
 
-		if ( @$this->verifyId( $pParamHash['status_id'] ) ) {
-			if ($pParamHash['status_id'] > ARTICLE_STATUS_PENDING) {
-				if ( $gBitUser->hasPermission( 'p_articles_approve_submission' )) {
-					$pParamHash['article_store']['status_id'] =(int) ( $pParamHash['status_id'] );
-				} else {
-					$pParamHash['article_store']['status_id'] = ARTICLE_STATUS_PENDING;
-				}
-			} else {
-				$pParamHash['article_store']['status_id'] =(int) ( $pParamHash['status_id'] );
-			}
-		} elseif ( @$this->verifyId( $this->mInfo['status_id'] ) ) {
+		if (@$this->verifyId( $pParamHash['status_id'] )) {
+			$pParamHash['article_store']['status_id'] = ( $pParamHash['status_id'] > ARTICLE_STATUS_PENDING ) ? ( $gBitUser->hasPermission( 'p_articles_approve_submission' ) ) ? (int) ( $pParamHash['status_id'] ) : ARTICLE_STATUS_PENDING : (int) ( $pParamHash['status_id'] );
+		}
+		elseif (@$this->verifyId( $this->mInfo['status_id'] )) {
 			$pParamHash['article_store']['status_id'] = $this->mInfo['status_id'];
-		} else {
-			if ( $gBitUser->hasPermission( 'p_articles_approve_submission' ) || $gBitUser->hasPermission( 'p_articles_auto_approve' ) ) {
-				$pParamHash['article_store']['status_id'] = ARTICLE_STATUS_APPROVED;
-			} else {
-				$pParamHash['article_store']['status_id'] = ARTICLE_STATUS_PENDING;		// Default status
-			}
+		}
+		else {
+			$pParamHash['article_store']['status_id'] = ( $gBitUser->hasPermission( 'p_articles_approve_submission' ) || $gBitUser->hasPermission( 'p_articles_auto_approve' ) ) ? ARTICLE_STATUS_APPROVED : ARTICLE_STATUS_PENDING;
 		}
 
 		// content preferences
 		$prefs = array();
-		if ( $gBitUser->hasPermission( 'p_liberty_enter_html' ) ) {
+		if ($gBitUser->hasPermission( 'p_liberty_enter_html' )) {
 			$prefs[] = 'content_enter_html';
 		}
 
-		foreach ($prefs as $pref) {
-			if ( !empty( $pParamHash['preferences'][$pref] ) ) {
-				$pParamHash['preferences_store'][$pref] = $pParamHash['preferences'][$pref];
-			} else {
-				$pParamHash['preferences_store'][$pref] = NULL;
-			}
+		foreach ( $prefs as $pref ) {
+			$pParamHash['preferences_store'][$pref] = ( !empty( $pParamHash['preferences'][$pref] ) ) ? $pParamHash['preferences'][$pref] : null;
 		}
 
-		if ( array_search( $pParamHash['article_store']['status_id'], array( ARTICLE_STATUS_DENIED, ARTICLE_STATUS_DRAFT, ARTICLE_STATUS_PENDING ) ) ) {
-				$this->mInfo["no_index"] = true ;
+		if (array_search( $pParamHash['article_store']['status_id'], array( ARTICLE_STATUS_DENIED, ARTICLE_STATUS_DRAFT, ARTICLE_STATUS_PENDING ) )) {
+			$this->mInfo["no_index"] = true;
 		}
 
 		// if we have an error we get them all by checking parent classes for additional errors
-		if ( count( $this->mErrors ) > 0 ) {
+		if (count( $this->mErrors ) > 0) {
 			parent::verify( $pParamHash );
 		}
 
@@ -366,7 +353,7 @@ class BitArticle extends LibertyMime
 
 		if ( empty( $data['parsed'] ) ) {
 			$data['no_cache']    = TRUE;
-			$data['parsed'] = $this->parseData( $data );
+			$data['parsed'] = self::parseDataHash( $data );
 			// replace the split syntax with a horizontal rule
 			$data['parsed'] = preg_replace( LIBERTY_SPLIT_REGEX, "<hr />", $data['parsed'] );
 		}
@@ -381,7 +368,7 @@ class BitArticle extends LibertyMime
 	/**
 	* Get the URL for any given article image
 	* @param $pParamHash pass in full set of data returned from article query
-	* @return url to image
+	* @return string url to image
 	* @access public
 	**/
 	public static function getImageThumbnails($pParamHash)
@@ -392,11 +379,10 @@ class BitArticle extends LibertyMime
 		$thumbHash['mime_image'] = FALSE;
 		if ( !empty( $pParamHash['image_attachment_path'] )) {
 			$thumbHash['source_file'] = $pParamHash['image_attachment_path'];
-			$ret = liberty_fetch_thumbnails( $thumbHash );
+			$ret = \Bitweaver\Liberty\liberty_fetch_thumbnails( $thumbHash );
 		} elseif ( !empty( $pParamHash['has_topic_image'] ) && $pParamHash['has_topic_image'] == 'y' ) {
-return BitArticleTopic::getTopicImageStorageUrl( $pParamHash['topic_id'] );
 			$thumbHash['source_file'] = preg_replace( "#^/+#", "", BitArticleTopic::getTopicImageStorageUrl( $pParamHash['topic_id'] ));
-			$ret = liberty_fetch_thumbnails( $thumbHash );
+			$ret = \Bitweaver\Liberty\liberty_fetch_thumbnails( $thumbHash );
 		}
 
 		return $ret;
@@ -407,7 +393,7 @@ return BitArticleTopic::getTopicImageStorageUrl( $pParamHash['topic_id'] );
 	* @return bool TRUE on success, FALSE on failure
 	* @access public
 	**/
-	public function expunge()
+	public function expunge(): bool
 	{
 		$ret = FALSE;
 		if ( $this->isValid() ) {
@@ -588,11 +574,11 @@ return BitArticleTopic::getTopicImageStorageUrl( $pParamHash['topic_id'] );
 
     /**
     * Returns include file that will setup vars for display
-    * @return the fully specified path to file to be included
+    * @return string the fully specified path to file to be included
     */
 	public function getRenderFile()
 	{
-		return ARTICLES_PKG_INCLUDE_PATH.'display_article_inc.php';
+		return ARTICLES_PKG_PATH."display_article_inc.php";
 	}
 
 	/**
@@ -623,13 +609,13 @@ return BitArticleTopic::getTopicImageStorageUrl( $pParamHash['topic_id'] );
 
 	/**
 	* Generates the URL to the article
-	* @return the link to the full article
+	* @return string the link to the full article
 	*/
 	public static function getDisplayUrlFromHash(&$pParamHash)
 	{
 		global $gBitSystem;
 
-		$ret = NULL;
+		$ret = '';
 
 		if ( @BitBase::verifyId( $pParamHash['article_id'] ) ) {
 			if ( $gBitSystem->isFeatureActive( 'pretty_urls_extended' ) ) {
@@ -647,7 +633,7 @@ return BitArticleTopic::getTopicImageStorageUrl( $pParamHash['topic_id'] );
 
     /**
     * Function that returns link to display an image
-    * @return the url to display the gallery.
+    * @return string the url to display the gallery.
     */
 	public function getDisplayUrl()
 	{
@@ -657,10 +643,10 @@ return BitArticleTopic::getTopicImageStorageUrl( $pParamHash['topic_id'] );
 
 	/**
 	* get a list of all available statuses
-	* @return an array of available statuses
+	* @return array of available statuses
 	* @access public
 	**/
-	public function getStatusList()
+	public static function getStatusList()
 	{
 		global $gBitSystem;
 		$query = "SELECT * FROM `".BIT_DB_PREFIX."article_status`";
@@ -672,13 +658,13 @@ return BitArticleTopic::getTopicImageStorageUrl( $pParamHash['topic_id'] );
 	* set the status of an article
 	* @param $pStatusId new status id of the article
 	* @param $pArticleId of the article that is being changed - if not set, it will attemtp to change the currently loaded article
-	* @return new status of article on success - else returns NULL
+	* @return int new status of article on success - else returns NULL
 	* @access public
 	**/
 	public function setStatus($pStatusId, $pArticleId = NULL, $pContentId = NULL)
 	{
 		global $gBitSystem;
-		$validStatuses = array( ARTICLE_STATUS_DENIED, ARTICLE_STATUS_DRAFT, ARTICLE_STATUS_PENDING, ARTICLE_STATUS_APPROVED, ARTICLE_STATUS_RETIRED );
+		$validStatuses = [ ARTICLE_STATUS_DENIED, ARTICLE_STATUS_DRAFT, ARTICLE_STATUS_PENDING, ARTICLE_STATUS_APPROVED, ARTICLE_STATUS_RETIRED ];
 
 		if ( !in_array( $pStatusId, $validStatuses ) ) {
 			$this->mErrors[] = "Invalid article status";
@@ -701,12 +687,13 @@ return BitArticleTopic::getTopicImageStorageUrl( $pParamHash['topic_id'] );
 			if ( $gBitSystem->isPackageActive( 'search' ) ) {
 				include_once( SEARCH_PKG_PATH.'refresh_functions.php' );
 				if ($pStatusId == ARTICLE_STATUS_APPROVED) {
-					refresh_index($this);
+					\Bitweaver\Liberty\refresh_index($this);
 				} elseif (!$pStatusId == ARTICLE_STATUS_RETIRED) {
-					delete_index($pContentId); // delete it from the search index unless retired ...
+					\Bitweaver\Liberty\delete_index($pContentId); // delete it from the search index unless retired ...
 				}
 			}
 			return $pStatusId;
 		}
+		return false;
 	}
 }

@@ -1,4 +1,4 @@
-<script type="text/javascript">//<![CDATA[
+<script>//<![CDATA[
 	function charCounter( textareaId, counterId, maxLimit ) {ldelim}
 		document.getElementById( counterId ).value = maxLimit - document.getElementById( textareaId ).value.length;
 	{rdelim}

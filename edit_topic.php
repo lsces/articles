@@ -9,7 +9,7 @@
  * Initialization
  */
 require_once '../kernel/includes/setup_inc.php';
-require_once( ARTICLES_PKG_CLASS_PATH.'BitArticle.php' );
+use Bitweaver\Articles\BitArticle;
 
 include_once( ARTICLES_PKG_INCLUDE_PATH.'lookup_article_topic_inc.php' );
 
