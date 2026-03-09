@@ -14,9 +14,9 @@ require_once( LIBERTY_PKG_INCLUDE_PATH.'lookup_content_inc.php' );
 
 // if we already have a gContent, we assume someone else created it for us, and has properly loaded everything up.
 if( empty( $gContent ) || !is_object( $gContent ) ) {
-	if (@BitBase::verifyId( $_REQUEST['article_id'] ) ) {
+	if (@BitBase::verifyId( $_REQUEST['article_id'] ?? 0 ) ) {
 		$gContent = new BitArticle( $_REQUEST['article_id'] );
-	} elseif( @BitBase::verifyId( $_REQUEST['content_id'] ) ) {
+	} elseif( @BitBase::verifyId( $_REQUEST['content_id'] ?? 0 ) ) {
 		$gContent = new BitArticle( NULL, $_REQUEST['content_id'] );
 	} else {
 		$gContent = new BitArticle();

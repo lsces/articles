@@ -22,14 +22,14 @@
 	{/if}
 
 	{formfeedback hash=$feedback}
-	{formfeedback warning=$errors.title}
+	{formfeedback warning=$errors.title|default:''}
 
 	<div class="body">
 		{form enctype="multipart/form-data" id="writearticle"}
 			<input type="hidden" name="article_id" value="{$gContent->mArticleId}" />
 			<input type="hidden" name="content_id" value="{$gContent->getField('content_id')}" />
-			<input type="hidden" name="preview_image_url" value="{$article.preview_image_url}" />
-			<input type="hidden" name="preview_image_path" value="{$article.preview_image_path}" />
+			<input type="hidden" name="preview_image_url" value="{$article.preview_image_url|default:''}" />
+			<input type="hidden" name="preview_image_path" value="{$article.preview_image_path|default:''}" />
 
 			{jstabs}
 				{jstab title="Article Body"}
@@ -118,7 +118,7 @@
 						{if $gBitSystem->isFeatureActive( 'articles_submissions_rnd_img' ) && !( $gContent->mArticleId || ( $gContent->hasUserPermission('p_articles_approve_submission') || $gContent->hasUserPermission('p_articles_auto_approve') ) )}
 							<hr />
 							{formfeedback error=$errors.captcha}
-							{captcha force=true variant=row}
+							{* captcha force=true variant=row *}
 						{/if}
 
 						<div class="form-group submit">

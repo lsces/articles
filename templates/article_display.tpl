@@ -15,7 +15,7 @@
 		{/if}
 		{*<a style="display:none;" href="{$smarty.const.ARTICLES_PKG_URL}print.php?article_id={$article.article_id}">{booticon iname="icon-print"  ipackage="icons"  iexplain=print}</a>*}
 		{if $gContent->hasUserPermission( 'p_articles_remove' )}
-			{smartlink ititle="Remove" ipackage=articles ifile="list.php" booticon="icon-trash" action=remove remove_article_id=$article.article_id status_id=$smarty.request.status_id}
+			{smartlink ititle="Remove" ipackage=articles ifile="list.php" booticon="icon-trash" action=remove remove_article_id=$article.article_id status_id=$smarty.request.status_id|default:0}
 		{/if}
 	</div><!-- end .footer -->
 
@@ -72,7 +72,7 @@
 			{if $showDescriptionsOnly}
 				{$article.parsed_description}
 			{else}
-				{$article.parsed}
+				{$article.parsed_data}
 			{/if}
 		</div>
 

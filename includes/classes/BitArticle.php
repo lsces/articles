@@ -284,7 +284,7 @@ class BitArticle extends LibertyMime
 			$pParamHash['article_store']['expire_date'] = $pParamHash['expire_date'];
 		}
 
-		if (@$this->verifyId( $pParamHash['status_id'] )) {
+		if ( !empty($pParamHash['status_id']) and @$this->verifyId( $pParamHash['status_id'] )) {
 			$pParamHash['article_store']['status_id'] = ( $pParamHash['status_id'] > ARTICLE_STATUS_PENDING ) ? ( $gBitUser->hasPermission( 'p_articles_approve_submission' ) ) ? (int) ( $pParamHash['status_id'] ) : ARTICLE_STATUS_PENDING : (int) ( $pParamHash['status_id'] );
 		}
 		elseif (@$this->verifyId( $this->mInfo['status_id'] )) {
@@ -453,18 +453,18 @@ class BitArticle extends LibertyMime
 			// or a string
 			$whereSql .= " AND UPPER( lc.`title` ) LIKE ? ";
 			$bindVars[] = '%'.strtoupper( $find ).'%';
-		} elseif ( @$this->verifyId( $pParamHash['user_id'] ) ) {
+		} elseif ( @$this->verifyId( $pParamHash['user_id'] ?? 0 ) ) {
 			// or gate on a user
 			$whereSql .= " AND lc.`user_id` = ? ";
 			$bindVars[] = (int) $pParamHash['user_id'];
 		}
 
-		if ( @$this->verifyId( $pParamHash['status_id'] ) ) {
+		if ( @$this->verifyId( $pParamHash['status_id'] ?? 0 ) ) {
 			$whereSql .= " AND a.`status_id` = ? ";
 			$bindVars[] = $pParamHash['status_id'];
 		}
 
-		if ( @$this->verifyId( $pParamHash['type_id'] ) ) {
+		if ( @$this->verifyId( $pParamHash['type_id'] ?? 0 ) ) {
 			$whereSql .= " AND a.`article_type_id` = ? ";
 			$bindVars[] = (int) $pParamHash['type_id'];
 		}
@@ -510,7 +510,7 @@ class BitArticle extends LibertyMime
 			$bindVars[] = 'y';
 		}
 
-		if ( @$this->verifyId( $pParamHash['topic_id'] ) ) {
+		if ( @$this->verifyId( $pParamHash['topic_id'] ?? 0 ) ) {
 			$whereSql .= " AND a.`topic_id` = ? ";
 			$bindVars[] = (int) $pParamHash['topic_id'];
 		} elseif ( !empty( $pParamHash['topic'] ) ) {

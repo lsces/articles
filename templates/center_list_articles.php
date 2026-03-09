@@ -2,9 +2,9 @@
 use Bitweaver\Users\RoleUser;
 
 global $gBitSmarty, $gBitSystem, $gQueryUserId, $moduleParams, $gContent;
-if ( !empty( $moduleParams ) ) {
-	extract( $moduleParams );
-}
+//if ( !empty( $moduleParams->value ) ) {
+//	extract( $moduleParams->value );
+//}
 
 
 include_once( ARTICLES_PKG_INCLUDE_PATH.'lookup_article_inc.php' );
@@ -27,9 +27,9 @@ if ( !empty( $_REQUEST['topic'] ) ) {
 	$gBitSmarty->assign( 'topic', $_REQUEST['topic'] );
 }
 
-if ( !empty( $moduleParams )) {
-	$listHash = array_merge( $_REQUEST, $moduleParams['module_params'] );
-	$listHash['max_records'] = $module_rows;
+if ( !empty( $moduleParams->value )) {
+	$listHash = array_merge( $_REQUEST, $moduleParams->value );
+	$listHash['max_records'] = $module_rows ?? 0;
 	//$listHash['parse_data'] = TRUE;
 	//$listHash['load_comments'] = TRUE;
 } else {

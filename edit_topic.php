@@ -25,7 +25,7 @@ if( !$gContent->isValid() ) {
 	die;
 }
 
-$gBitSmarty->assignByRef( 'topic_info', $gContent->mInfo);
+$gBitSmarty->assign( 'topic_info', $gContent->mInfo);
 
 if( isset( $_REQUEST["fSubmitSaveTopic"] ) ) {
     $gContent->storeTopic( $_REQUEST );

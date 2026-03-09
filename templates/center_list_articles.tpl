@@ -5,7 +5,7 @@
 		</div>
 	{/if}
 
-	{formfeedback success=$smarty.request.feedback}
+	{formfeedback success=$smarty.request.feedback|default:''}
 
 	{include file="bitpackage:articles/article_filter_inc.tpl"}
 	{if $gBitUser->hasPermission( 'p_articles_admin' ) && $futures}

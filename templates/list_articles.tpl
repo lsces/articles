@@ -25,7 +25,7 @@
 
 	<div class="body">
 
-		{formfeedback hash=$feedback}
+		{formfeedback hash=$feedback|default:''}
 
 		{include file="bitpackage:liberty/services_inc.tpl" serviceLocation='list_options'}
 
