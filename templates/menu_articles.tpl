@@ -6,7 +6,7 @@
 		{if $gBitUser->hasPermission( 'p_articles_approve_submission ' ) ||
 		    $gBitUser->hasPermission( 'p_articles_auto_approve') ||
 		    $gBitUser->hasPermission( 'p_articles_submit' ) }
-			{if $gBitUser->hasPermission( 'p_articles_approve_submission ' ) || $gBitUser->hasPermission( 'p_articles_auto_approve' )}
+			{if $gBitUser->hasPermission( 'p_articles_approve_submission ' ) or $gBitUser->hasPermission( 'p_articles_auto_approve' )}
 				{assign var=iexplain value="Write Article"}
 			{else}
 				{assign var=iexplain value="Submit Article"}
@@ -19,14 +19,14 @@
 		{if $gBitUser->hasPermission( 'p_articles_submit ' ) ||
 			$gBitUser->hasPermission( 'p_articles_approve_submission ' ) ||
 			$gBitUser->hasPermission( 'p_articles_remove_submission ' ) ||
-			($gBitSystem->isFeatureActive('articles_auto_approve') && $gBitUser->isRegistered())}
+			($gBitSystem->isFeatureActive('articles_auto_approve') and $gBitUser->isRegistered())}
 			<li><a class="item" href="{$smarty.const.ARTICLES_PKG_URL}list.php?status_id="{$smarty.const.ARTICLE_STATUS_PENDING}">{booticon iname="icon-list" ipackage="icons" iexplain="List Submissions" ilocation="menu"}</a></li>
 		{/if}
 	{/if}
 	{if $gBitUser->hasPermission( 'p_articles_admin' )}
 		<li><a class="item" href="{$smarty.const.ARTICLES_PKG_URL}list.php?get_future=1">{booticon iname="icon-list" ipackage="icons" iexplain="List Upcoming" ilocation=menu}</a></li>
 	{/if}
-	{if $gBitSystem->isFeatureActive( 'articles_rankings' ) && $gBitUser->hasPermission( 'p_articles_read ' )}
+	{if $gBitSystem->isFeatureActive( 'articles_rankings' ) and $gBitUser->hasPermission( 'p_articles_read ' )}
 		<li><a class="item" href="{$smarty.const.ARTICLES_PKG_URL}rankings.php">{booticon iname="icon-sort"  ipackage="icons"  iexplain="Article Rankings" ilocation=menu}</a></li>
 	{/if}
 	{if $gBitUser->hasPermission( 'p_articles_read' )}

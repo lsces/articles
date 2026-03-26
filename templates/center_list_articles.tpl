@@ -8,7 +8,7 @@
 	{formfeedback success=$smarty.request.feedback|default:''}
 
 	{include file="bitpackage:articles/article_filter_inc.tpl"}
-	{if $gBitUser->hasPermission( 'p_articles_admin' ) && $futures}
+	{if $gBitUser->hasPermission( 'p_articles_admin' ) and $futures}
 		<h3>{tr}Upcoming Articles{/tr}</h3>
 		<ul>
 			{foreach from=$futures item=future}
@@ -16,14 +16,14 @@
 			{/foreach}
 		</ul>
 	{/if}
-	{if $gBitUser->hasPermission( 'p_articles_approve_submission' ) && $submissions}
+	{if $gBitUser->hasPermission( 'p_articles_approve_submission' ) and $submissions}
 		<h3>{tr}Submitted Articles{/tr}</h3>
 		<ul>
 			{foreach from=$submissions item=submission}
 				<li>{$submission.display_link} <small>[ {tr}Submitted{/tr}: {$submission.last_modified|bit_long_datetime} ]</small></li>
 			{/foreach}
 		</ul>
-	{elseif $submissions && $gBitSystem->isFeatureActive('articles_auto_approve') && $gBitUser->isRegistered()}
+	{elseif $submissions and $gBitSystem->isFeatureActive('articles_auto_approve') and $gBitUser->isRegistered()}
 		<h3 style="margin-bottom:1em;">{tr}There are <a href="{$smarty.const.ARTICLES_PKG_URL}list.php?status_id={$smarty.const.ARTICLE_STATUS_PENDING}">more articles</a> that haven't made it here yet{/tr}</h3>
 	{/if}
 
