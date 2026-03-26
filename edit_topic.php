@@ -10,6 +10,7 @@
  */
 require_once '../kernel/includes/setup_inc.php';
 use Bitweaver\Articles\BitArticle;
+use Bitweaver\KernelTools;
 
 include_once( ARTICLES_PKG_INCLUDE_PATH.'lookup_article_topic_inc.php' );
 
@@ -30,7 +31,7 @@ $gBitSmarty->assign( 'topic_info', $gContent->mInfo);
 if( isset( $_REQUEST["fSubmitSaveTopic"] ) ) {
     $gContent->storeTopic( $_REQUEST );
 	$gContent->loadTopic();
-    bit_redirect( ARTICLES_PKG_URL . "admin/admin_topics.php" );
+    KernelTools::bit_redirect( ARTICLES_PKG_URL . "admin/admin_topics.php" );
 } elseif( isset( $_REQUEST['fRemoveTopicImage'] ) ) {
 	$gContent->removeTopicImage();
 }
