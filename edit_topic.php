@@ -14,14 +14,14 @@ use Bitweaver\Articles\BitArticle;
 include_once( ARTICLES_PKG_INCLUDE_PATH.'lookup_article_topic_inc.php' );
 
 if ( !$gBitSystem->verifyPackage( 'articles' ) ) {
-   $gBitSmarty->assign( 'msg', tra( "This package is disabled" ) . ": Articles" );
-   $gBitSystem->display( "error.tpl" , NULL, array( 'display_mode' => 'edit' ));
+   $gBitSmarty->assign( 'msg', KernelTools::tra( "This package is disabled" ) . ": Articles" );
+   $gBitSystem->display( "error.tpl" , NULL, [ 'display_mode' => 'edit' ]);
    die;
 }
 
 if( !$gContent->isValid() ) {
-	$gBitSmarty->assign( 'msg', tra("Article topic not found") );
-	$gBitSystem->display('error.tpl', NULL, array( 'display_mode' => 'edit' ));
+	$gBitSmarty->assign( 'msg', KernelTools::tra("Article topic not found") );
+	$gBitSystem->display('error.tpl', NULL, [ 'display_mode' => 'edit' ]);
 	die;
 }
 
@@ -35,4 +35,4 @@ if( isset( $_REQUEST["fSubmitSaveTopic"] ) ) {
 	$gContent->removeTopicImage();
 }
 
-$gBitSystem->display( 'bitpackage:articles/edit_topic.tpl' , NULL, array( 'display_mode' => 'edit' ));
+$gBitSystem->display( 'bitpackage:articles/edit_topic.tpl' , NULL, [ 'display_mode' => 'edit' ]);
