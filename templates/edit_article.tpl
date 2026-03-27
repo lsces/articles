@@ -50,7 +50,7 @@
 							{/forminput}
 						</div>
 
-						{if $topics or $gContent->hasUserPermission( 'p_articles_admin' )}
+						{if $topics || $gContent->hasUserPermission( 'p_articles_admin' )}
 							<div class="form-group">
 								{formlabel label="Topic" for="topic_id"}
 								{forminput}
@@ -58,7 +58,7 @@
 										<select name="topic_id" id="topic_id">
 											<option value="">{tr}None{/tr}</option>
 											{section name=t loop=$topics}
-												<option value="{$topics[t].topic_id}" {if $article.topic_id eq $topics[t].topic_id or $topic eq $topics[t].topic_name}selected="selected"{/if}>{$topics[t].topic_name|escape}</option>
+												<option value="{$topics[t].topic_id}" {if $article.topic_id eq $topics[t].topic_id || $topic eq $topics[t].topic_name}selected="selected"{/if}>{$topics[t].topic_name|escape}</option>
 											{/section}
 										</select>
 									{else}
@@ -95,7 +95,7 @@
 									<select name="rating" id="rating">
 										<option value="5" {if $article.rating eq 5}selected="selected"{/if}>{tr}5{/tr}</option>
 										<option value="4" {if $article.rating eq 4}selected="selected"{/if}>{tr}4{/tr}</option>
-										<option value="3" {if $article.rating eq 3 or !$article.rating}selected="selected"{/if}>{tr}3{/tr}</option>
+										<option value="3" {if $article.rating eq 3 || !$article.rating}selected="selected"{/if}>{tr}3{/tr}</option>
 										<option value="2" {if $article.rating eq 2}selected="selected"{/if}>{tr}2{/tr}</option>
 										<option value="1" {if $article.rating eq 1}selected="selected"{/if}>{tr}1{/tr}</option>
 									</select>

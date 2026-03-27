@@ -35,20 +35,20 @@
 		{/if}
 	</div>
 
-	<div class="body"{if $gBitUser->getPreference( 'users_double_click' ) and $gContent->hasUpdatePermission()} ondblclick="location.href='{$smarty.const.ARTICLES_PKG_URL}edit.php?article_id={$article.article_id}';"{/if}>
+	<div class="body"{if $gBitUser->getPreference( 'users_double_click' ) && $gContent->hasUpdatePermission()} ondblclick="location.href='{$smarty.const.ARTICLES_PKG_URL}edit.php?article_id={$article.article_id}';"{/if}>
 		<div class="content">
 			{include file="bitpackage:liberty/services_inc.tpl" serviceLocation='body' serviceHash=$article}
 			{* deal with the article image if there is one *}
 			{if $article.show_image eq 'y' && ( $article.thumbnail_url || $article.primary_attachment )}
 				<div class="image">
 					{assign var=size value=$gBitSystem->getConfig('articles_image_size','small')}
-					{if $showDescriptionsOnly and $article.has_more}<a href="{$article.display_url}">{/if}
+					{if $showDescriptionsOnly && $article.has_more}<a href="{$article.display_url}">{/if}
 					{if $article.primary_attachment}
 						{include file=$gLibertySystem->getMimeTemplate('inline',$article.primary_attachment.attachment_plugin_guid) attachment=$article.primary_attachment thumbsize=$size}
 					{else}
 						<img class="icon" alt="{$article.topic_name|default:$article.title|escape}" title="{$article.topic_name|default:$article.title|escape}" src="{$article.thumbnail_url}"/>
 					{/if}
-					{if $showDescriptionsOnly and $article.has_more}</a>{/if}
+					{if $showDescriptionsOnly && $article.has_more}</a>{/if}
 				</div>
 			{/if}
 
@@ -82,7 +82,7 @@
 				{$article.hits|default:0} {tr}reads{/tr}
 			{/if}
 
-			{if $showDescriptionsOnly and $article.has_more}
+			{if $showDescriptionsOnly && $article.has_more}
 				{if $spacer}&nbsp; &bull; &nbsp;{/if}
 				{assign var=spacer value=TRUE}
 				<a class="more" href="{$article.display_url}">{tr}Read More&hellip;{/tr}</a>
@@ -122,7 +122,7 @@
 	</div><!-- end .body -->
 </div><!-- end .article -->
 
-{if $print_page ne 'y' and $article.allow_comments eq 'y' and !$preview && !$showDescriptionsOnly and $article.status_id eq $smarty.const.ARTICLE_STATUS_APPROVED}
+{if $print_page ne 'y' && $article.allow_comments eq 'y' && !$preview && !$showDescriptionsOnly && $article.status_id eq $smarty.const.ARTICLE_STATUS_APPROVED}
 	{include file="bitpackage:liberty/comments.tpl"}
 {/if}
 

@@ -89,9 +89,9 @@
 								{tr}Created by{/tr}: {displayname user_id=$article.user_id}
 							{/if}
 
-							{if $gBitSystem->isFeatureActive( 'articles_list_date' ) or $gBitSystem->isFeatureActive( 'articles_list_expire' )}<br />{/if}
+							{if $gBitSystem->isFeatureActive( 'articles_list_date' ) || $gBitSystem->isFeatureActive( 'articles_list_expire' )}<br />{/if}
 
-							{if $gBitSystem->isFeatureActive( 'articles_list_date' ) and $gBitSystem->isFeatureActive( 'articles_list_expire' )}
+							{if $gBitSystem->isFeatureActive( 'articles_list_date' ) && $gBitSystem->isFeatureActive( 'articles_list_expire' )}
 								{tr}Displayed from <strong>{$article.publish_date|bit_short_datetime}</strong> until <strong>{$article.expire_date|bit_short_datetime}</strong>{/tr}
 							{elseif $gBitSystem->isFeatureActive( 'articles_list_date' )}
 								{tr}Displayed from <strong>{$article.publish_date|bit_short_datetime}</strong>{/tr}
@@ -133,11 +133,11 @@
 							<td style="text-align:right;">{$article.hits}</td>
 						{/if}
 						<td style="text-align:right;">
-							{if $article.status_id eq $smarty.const.ARTICLE_STATUS_PENDING and $gBitUser->hasPermission( 'p_articles_approve_submission' )}
+							{if $article.status_id eq $smarty.const.ARTICLE_STATUS_PENDING && $gBitUser->hasPermission( 'p_articles_approve_submission' )}
 								{smartlink ititle="Approve Article" booticon="icon-ok" sort_mode=$sort_mode status_id=$smarty.request.status_id article_id=$article.article_id content_id=$article.content_id set_status_id=$smarty.const.ARTICLE_STATUS_APPROVED action=approve}
 							{/if}
 
-							{if $gBitUser->hasPermission( 'p_articles_update' ) or ( $article.author eq $user and $article.creator_edit eq 'y' )}
+							{if $gBitUser->hasPermission( 'p_articles_update' ) || ( $article.author eq $user && $article.creator_edit eq 'y' )}
 								{smartlink ititle="Edit" ifile="edit.php" booticon="icon-edit" article_id=$article.article_id}
 							{/if}
 
