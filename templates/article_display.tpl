@@ -7,7 +7,7 @@
 <div class="{$outer_div|default:"post"}">
 	<div class="floaticon">
 		{include file="bitpackage:liberty/services_inc.tpl" serviceLocation='icon' serviceHash=$article}
-		{if $gContent->hasUserPermission( 'p_articles_read_history' ) and !$version and $article.version > 1}
+		{if $gContent->hasUserPermission( 'p_articles_read_history' ) && !$version && $article.version > 1}
 			{smartlink ititle="View History" ipackage=articles ifile="article_history.php" booticon="icon-time" article_id=$article.article_id}
 		{/if}
 		{if $gContent->hasUpdatePermission()}
@@ -21,7 +21,7 @@
 
 	<div class="header">
 		<h1>{$article.title|escape}</h1>
-		{if $article.show_author eq 'y' or $article.show_pubdate eq 'y'}
+		{if $article.show_author eq 'y' || $article.show_pubdate eq 'y'}
 			<div class="date">
 				{if $article.show_author eq 'y'}
 					{* can't really use the link here since it only works when the user uses his login name *}
@@ -39,7 +39,7 @@
 		<div class="content">
 			{include file="bitpackage:liberty/services_inc.tpl" serviceLocation='body' serviceHash=$article}
 			{* deal with the article image if there is one *}
-			{if $article.show_image eq 'y' and ( $article.thumbnail_url or $article.primary_attachment )}
+			{if $article.show_image eq 'y' && ( $article.thumbnail_url || $article.primary_attachment )}
 				<div class="image">
 					{assign var=size value=$gBitSystem->getConfig('articles_image_size','small')}
 					{if $showDescriptionsOnly and $article.has_more}<a href="{$article.display_url}">{/if}
@@ -53,7 +53,7 @@
 			{/if}
 
 			{if $article.show_image eq 'y'}{assign var=hideprimary value=y}{/if}
-			{if $gBitSystem->isFeatureActive( 'articles_attachments' ) and $gBitSystem->isFeatureActive( 'liberty_auto_display_attachment_thumbs' )}
+			{if $gBitSystem->isFeatureActive( 'articles_attachments' ) && $gBitSystem->isFeatureActive( 'liberty_auto_display_attachment_thumbs' )}
 				{include file="bitpackage:liberty/storage_thumbs.tpl"}
 			{/if}
 
@@ -104,7 +104,7 @@
 			{/if}
 		</div>
 
-		{if $article.status_id == $smarty.const.ARTICLE_STATUS_PENDING and !$preview}
+		{if $article.status_id == $smarty.const.ARTICLE_STATUS_PENDING && !$preview}
 			<div class="form-group">
 				{formlabel label="Approve or deny Submission"}
 				{forminput}
@@ -112,7 +112,7 @@
 						<a href="{$smarty.const.ARTICLES_PKG_URL}list.php?status_id={$article.status_id}&amp;article_id={$article.article_id}&amp;content_id={$article.content_id}&amp;set_status_id=300&amp;action=approve">{biticon ipackage=icons iname="large/dialog-ok" iexplain="Approve Article"}</a> &nbsp;
 					{/if}
 
-					{if $gContent->hasUserPermission( 'p_articles_remove' ) or $gContent->hasUserPermission( 'p_articles_remove_submission' )}
+					{if $gContent->hasUserPermission( 'p_articles_remove' ) || $gContent->hasUserPermission( 'p_articles_remove_submission' )}
 						<a href="{$smarty.const.ARTICLES_PKG_URL}list.php?status_id={$article.status_id}&amp;remove_article_id={$article.article_id}&amp;action=remove">{biticon ipackage=icons iname="large/dialog-cancel" iexplain="Remove Article"}</a>
 					{/if}
 				{/forminput}
@@ -122,7 +122,7 @@
 	</div><!-- end .body -->
 </div><!-- end .article -->
 
-{if $print_page ne 'y' and $article.allow_comments eq 'y' and !$preview and !$showDescriptionsOnly and $article.status_id eq $smarty.const.ARTICLE_STATUS_APPROVED}
+{if $print_page ne 'y' and $article.allow_comments eq 'y' and !$preview && !$showDescriptionsOnly and $article.status_id eq $smarty.const.ARTICLE_STATUS_APPROVED}
 	{include file="bitpackage:liberty/comments.tpl"}
 {/if}
 

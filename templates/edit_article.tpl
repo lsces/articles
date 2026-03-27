@@ -9,7 +9,7 @@
 	<div class="header">
 		{if $gContent->mArticleId}
 			<h1>{tr}Edit Article{/tr}: {$article.title|escape}</h1>
-			{elseif $gContent->hasUserPermission('p_articles_approve_submission') or $gContent->hasUserPermission('p_articles_auto_approve')}
+			{elseif $gContent->hasUserPermission('p_articles_approve_submission') || $gContent->hasUserPermission('p_articles_auto_approve')}
 			<h1>{tr}Create Article{/tr}</h1>
 		{else}
 			<h1>{tr}Submit Article{/tr}</h1>
@@ -115,7 +115,7 @@
 
 						{include file="bitpackage:liberty/edit_services_inc.tpl" serviceFile="content_edit_mini_tpl"}
 
-						{if $gBitSystem->isFeatureActive( 'articles_submissions_rnd_img' ) and !( $gContent->mArticleId or ( $gContent->hasUserPermission('p_articles_approve_submission') or $gContent->hasUserPermission('p_articles_auto_approve') ) )}
+						{if $gBitSystem->isFeatureActive( 'articles_submissions_rnd_img' ) && !( $gContent->mArticleId || ( $gContent->hasUserPermission('p_articles_approve_submission') || $gContent->hasUserPermission('p_articles_auto_approve') ) )}
 							<hr />
 							{formfeedback error=$errors.captcha}
 							{* captcha force=true variant=row *}
@@ -158,7 +158,7 @@
 					{/legend}
 				{/jstab}
 
-				{if $gBitSystem->isFeatureActive( 'articles_attachments' ) and $gBitUser->hasPermission('p_liberty_attach_attachments') }
+				{if $gBitSystem->isFeatureActive( 'articles_attachments' ) && $gBitUser->hasPermission('p_liberty_attach_attachments') }
 					{jstab title="Attachments"}
 						{legend legend="Attachment Browser"}
 							{include file="bitpackage:liberty/edit_storage.tpl" formid="writearticle"}
