@@ -60,7 +60,7 @@ class BitArticle extends LibertyMime
 				'handler_class' => 'BitArticle',
 				'handler_package' => 'articles',
 				'handler_file' => 'BitArticle.php',
-				'maintainer_url' => 'http://www.bitweaver.org'
+				'maintainer_url' => 'https://www.bitweaver.org'
 		));
 		$this->mContentId = $pContentId;
 		$this->mArticleId = $pArticleId;
