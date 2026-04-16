@@ -682,7 +682,7 @@ class BitArticle extends LibertyMime
 
 		if ( @$this->verifyId( $pArticleId ) ) {
 			$sql = "UPDATE `".BIT_DB_PREFIX."articles` SET `status_id` = ? WHERE `article_id` = ?";
-			$rs = $this->mDb->query( $sql, array( $pStatusId, $pArticleId ));
+			$rs = $this->mDb->query( $sql, [ $pStatusId, $pArticleId ]);
 			// Calling the index function for approved articles ...
 			if ( $gBitSystem->isPackageActive( 'search' ) ) {
 				include_once( SEARCH_PKG_PATH.'refresh_functions.php' );

@@ -69,11 +69,11 @@ $gBitInstaller->registerPackageInfo( ARTICLES_PKG_NAME, array(
 
 // these sequences are automatically generated, but Firebird and MSSQL prefers they exist
 // Starting the numbering off at 5 for types to allow room for the INSERTs later.
-$sequences = array (
-	'articles_topics_id_seq' => array( 'start' => 1 ),
-	'article_types_id_seq' => array( 'start' => 5 ),
-	'articles_article_id_seq' => array( 'start' => 1 ),
-);
+$sequences = [
+	'articles_topics_id_seq'  => [ 'start' => 1 ],
+	'article_types_id_seq'    => [ 'start' => 5 ],
+	'articles_article_id_seq' => [ 'start' => 1 ],
+];
 $gBitInstaller->registerSchemaSequences( ARTICLES_PKG_NAME, $sequences );
 
 
