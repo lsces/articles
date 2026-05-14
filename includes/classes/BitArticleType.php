@@ -12,6 +12,7 @@
  * Required setup
  */
 namespace Bitweaver\Articles;
+
 use Bitweaver\BitBase;
 use Bitweaver\KernelTools;
 
@@ -119,12 +120,12 @@ class BitArticleType extends BitBase
 	public function removeType($iTypeId = NULL)
 	{
 		if (!$iTypeId) {
-		 	if (!$this->mTypeId) {
+			if (!$this->mTypeId) {
 				$this->mErrors[] = KernelTools::tra("Invalid type id given");
 				return NULL;
-			} else {
-				$iTypeId = $this->mTypeId;
 			}
+			$iTypeId = $this->mTypeId;
+
 		} else {
 			$iTypeId = (int)($iTypeId);
 		}
@@ -139,13 +140,13 @@ class BitArticleType extends BitBase
 
 		$query = "SELECT * FROM `" . BIT_DB_PREFIX . "article_types`";
 		$result = $gBitSystem->mDb->query( $query, [] );
-        $ret = [];
+		$ret = [];
 
-        while ( $res = $result->fetchRow() ) {
+		while ( $res = $result->fetchRow() ) {
 			$res['article_cnt'] = $gBitSystem->mDb->getOne( "select count(*) from `" . BIT_DB_PREFIX . "articles` where `article_type_id` = ?", [ $res['article_type_id'] ] );
-            $ret[] = $res;
-        }
+			$ret[] = $res;
+		}
 
-        return $ret;
+		return $ret;
 	}
 }
