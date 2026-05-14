@@ -6,7 +6,6 @@ global $gBitSmarty, $gBitSystem, $gQueryUserId, $moduleParams, $gContent;
 //	extract( $moduleParams->value );
 //}
 
-
 include_once( ARTICLES_PKG_INCLUDE_PATH.'lookup_article_inc.php' );
 include_once( ARTICLES_PKG_INCLUDE_PATH.'article_filter_inc.php' );
 
@@ -48,7 +47,7 @@ $gBitSmarty->assign( 'showDescriptionsOnly', TRUE );
 
 // display submissions if we have the perm to approve them
 if ( $gBitUser->hasPermission( 'p_articles_approve_submission' ) || ( $gBitSystem->isFeatureActive( 'articles_auto_approve' ) && $gBitUser->isRegistered() )) {
-	$listHash = array( 'status_id' => ARTICLE_STATUS_PENDING );
+	$listHash = [ 'status_id' => ARTICLE_STATUS_PENDING ];
 	$submissions = $gContent->getList( $listHash );
 	$gBitSmarty->assign( 'submissions', $submissions );
 }

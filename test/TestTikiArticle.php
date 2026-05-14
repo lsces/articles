@@ -4,27 +4,27 @@ use Bitweaver\Articles\BitArticle;
 
 class TestBitArticle extends Test
 {
-    public $test;
-    public $id;
-    public $count;
+	public $test;
+	public $id;
+	public $count;
 
-    public function TestBitArticle()
-    {
-        $this->test = new BitArticle();
-        Assert::equalsTrue($this->test != NULL, 'Error during initialisation');
-    }
+	public function TestBitArticle()
+	{
+		$this->test = new BitArticle();
+		Assert::equalsTrue($this->test != NULL, 'Error during initialisation');
+	}
 
-    public function testGetItems()
-    {
-	$filter = array();
-        $list = $this->test->getList($filter);
-        $this->count = count($list);
-        Assert::equalsTrue(is_array($list));
-    }
+	public function testGetItems()
+	{
+	$filter = [];
+		$list = $this->test->getList($filter);
+		$this->count = count($list);
+		Assert::equalsTrue(is_array($list));
+	}
 
-    public function testStoreItem()
-    {
-	$newItemHash = array(
+	public function testStoreItem()
+	{
+	$newItemHash = [
 		"title" => "Test Title",
 		"description" => "Test Description",
 		"data" => "Test Text",
@@ -43,43 +43,43 @@ class TestBitArticle extends Test
 		"hash" => NULL,
 		"type" => NULL,
 		"isfloat" => NULL,
-	);
-        Assert::equalsTrue($this->test->store($newItemHash));
-    }
+	];
+		Assert::equalsTrue($this->test->store($newItemHash));
+	}
 
-    public function testIsValidItem()
-    {
-        Assert::equalsTrue($this->test->isValid());
-    }
+	public function testIsValidItem()
+	{
+		Assert::equalsTrue($this->test->isValid());
+	}
 
-    public function testNullItem()
-    {
+	public function testNullItem()
+	{
 	$this->id = $this->test->mArticleId;
-        $this->test = NULL;
-        Assert::equals($this->test, NULL);
-    }
+		$this->test = NULL;
+		Assert::equals($this->test, NULL);
+	}
 
-    public function testLoadItem()
-    {
-        $this->test = new BitArticle($this->id);
-        Assert::equals($this->test->load(), 37);
-    }
+	public function testLoadItem()
+	{
+		$this->test = new BitArticle($this->id);
+		Assert::equals($this->test->load(), 37);
+	}
 
-    public function testUrlItem()
-    {
-        Assert::equalsTrue($this->test->getDisplayUrl() != "");
-    }
+	public function testUrlItem()
+	{
+		Assert::equalsTrue($this->test->getDisplayUrl() != "");
+	}
 
-    public function testExpungeItem()
-    {
-        Assert::equalsTrue($this->test->expunge());
-    }
+	public function testExpungeItem()
+	{
+		Assert::equalsTrue($this->test->expunge());
+	}
 
-    public function testCountItems()
-    {
-	$filter = array();
-        $count = count($this->test->getList($filter));
-        Assert::equals($this->count, $count);
-    }
+	public function testCountItems()
+	{
+	$filter = [];
+		$count = count($this->test->getList($filter));
+		Assert::equals($this->count, $count);
+	}
 
 }

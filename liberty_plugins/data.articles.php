@@ -89,19 +89,19 @@ function data_articles($data, $params) { // No change in the parameters with Cly
 
 		$module_params = $params;
 		$articlesObject = new BitArticle();
-		$stati = array( 'pending', 'approved' );
+		$stati = [ 'pending', 'approved' ];
 		$status_id = ( !empty( $module_params['status'] ) && in_array( $module_params['status'], $stati ) ) ? constant( 'ARTICLE_STATUS_' . strtoupper( $module_params['status'] ) ) : ARTICLE_STATUS_APPROVED;
 
-		$sortOptions = array(
+		$sortOptions = [
 			"last_modified_asc",
 			"last_modified_desc",
 			"created_asc",
 			"created_desc",
 			"random",
-		);
+		];
 		$sort_mode = ( !empty( $module_params['sort_mode'] ) && in_array( $module_params['sort_mode'], $sortOptions ) ) ? $module_params['sort_mode'] : 'last_modified_desc';
 
-		$getHash = Array();
+		$getHash = [];
 		$getHash['status_id']     = $status_id;
 		$getHash['sort_mode']     = $sort_mode;
 		$getHash['max_records']   = empty( $module_params['max'] ) ? 1 : $module_params['max'];
@@ -139,7 +139,7 @@ function data_articles($data, $params) { // No change in the parameters with Cly
 				break;
 		}
 		return $display_result;
-	} else {
-		return "<div class=error>The articles package is not active.</div>";
 	}
+	return "<div class=error>The articles package is not active.</div>";
+
 }

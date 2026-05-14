@@ -32,11 +32,11 @@ if( !$gBitUser->hasPermission( 'p_articles_read' ) ) {
 	$rss->useCached( $rss_version_name, $cacheFile, $gBitSystem->getConfig( 'rssfeed_cache_time' ));
 
 	$articles = new BitArticle();
-	$listHash = array(
+	$listHash = [
 		'status_id' => ARTICLE_STATUS_APPROVED,
 		'sort_mode' => 'publish_date_desc',
 		'max_records' => $gBitSystem->getConfig( 'articles_rss_max_records', 10 ),
-	);
+	];
 	$feeds = $articles->getList( $listHash );
 
 	// set the rss link

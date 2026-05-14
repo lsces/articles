@@ -8,6 +8,7 @@
  * required setup
  */
 namespace Bitweaver\Articles;
+
 use Bitweaver\KernelTools;
 
 require_once '../kernel/includes/setup_inc.php';
@@ -28,4 +29,4 @@ $gDefaultCenter = 'bitpackage:articles/center_list_articles.tpl';
 $gBitSmarty->assign( 'gDefaultCenter', $gDefaultCenter );
 
 // Display the template
-$gBitSystem->display( 'bitpackage:kernel/dynamic.tpl', KernelTools::tra( 'Articles' ) , array( 'display_mode' => 'display' ));
+$gBitSystem->display( 'bitpackage:kernel/dynamic.tpl', KernelTools::tra( 'Articles' ) , [ 'display_mode' => 'display' ]);

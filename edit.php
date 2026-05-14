@@ -72,7 +72,7 @@ if( !empty( $_REQUEST['save'] ) ) {
 }
 
 // Get a topic list
-$topics = BitArticleTopic::getTopicList( array( 'active_topic' => TRUE ) );
+$topics = BitArticleTopic::getTopicList( [ 'active_topic' => TRUE ] );
 $gBitSmarty->assign( 'topics', $topics );
 if ( !empty( $_REQUEST['topic'] ) ) {
 	$gBitSmarty->assign( 'topic', $_REQUEST['topic'] );
@@ -91,4 +91,4 @@ $gBitSmarty->assign( 'feedback', ( !empty( $feedback ) ? $feedback : NULL ) );
 
 // Display the Index Template
 $gBitSmarty->assign( 'show_page_bar', 'n' );
-$gBitSystem->display( 'bitpackage:articles/edit_article.tpl', KernelTools::tra( "Articles" ) , array( 'display_mode' => 'edit' ));
+$gBitSystem->display( 'bitpackage:articles/edit_article.tpl', KernelTools::tra( "Articles" ) , [ 'display_mode' => 'edit' ]);

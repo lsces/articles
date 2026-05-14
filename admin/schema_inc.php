@@ -62,10 +62,10 @@ foreach( array_keys( $tables ) AS $tableName ) {
 	$gBitInstaller->registerSchemaTable( ARTICLES_PKG_NAME, $tableName, $tables[$tableName] );
 }
 
-$gBitInstaller->registerPackageInfo( ARTICLES_PKG_NAME, array(
+$gBitInstaller->registerPackageInfo( ARTICLES_PKG_NAME, [
 	'description' => "This package manages news articles to create a slashdot-like news site.",
 	'license' => '<a href="http://www.gnu.org/licenses/licenses.html#LGPL">LGPL</a>',
-) );
+] );
 
 // these sequences are automatically generated, but Firebird and MSSQL prefers they exist
 // Starting the numbering off at 5 for types to allow room for the INSERTs later.
@@ -75,7 +75,6 @@ $sequences = [
 	'articles_article_id_seq' => [ 'start' => 1 ],
 ];
 $gBitInstaller->registerSchemaSequences( ARTICLES_PKG_NAME, $sequences );
-
 
 // $indices = array();
 // $gBitInstaller->registerSchemaIndexes( ARTICLES_PKG_NAME, $indices );
@@ -89,7 +88,7 @@ $gBitInstaller->registerSchemaDefault( ARTICLES_PKG_NAME, [
 	"INSERT INTO `" . BIT_DB_PREFIX . "article_status` (`status_id`, `status_name`) VALUES (100, 'Draft') ",
 	"INSERT INTO `" . BIT_DB_PREFIX . "article_status` (`status_id`, `status_name`) VALUES (200, 'Pending Approval') ",
 	"INSERT INTO `" . BIT_DB_PREFIX . "article_status` (`status_id`, `status_name`) VALUES (300, 'Approved') ",
-	"INSERT INTO `" . BIT_DB_PREFIX . "article_status` (`status_id`, `status_name`) VALUES (400, 'Retired') "
+	"INSERT INTO `" . BIT_DB_PREFIX . "article_status` (`status_id`, `status_name`) VALUES (400, 'Retired') ",
 ] );
 
 // ### Default UserPermissions
@@ -128,9 +127,9 @@ $gBitInstaller->registerPreferences( ARTICLES_PKG_NAME, [
 ] );
 
 if( defined( 'RSS_PKG_NAME' )) {
-	$gBitInstaller->registerPreferences( ARTICLES_PKG_NAME, array(
+	$gBitInstaller->registerPreferences( ARTICLES_PKG_NAME, [
 		[ RSS_PKG_NAME, ARTICLES_PKG_NAME . '_rss', 'y' ],
-	));
+	]);
 }
 
 // ### Register content types

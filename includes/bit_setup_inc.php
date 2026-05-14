@@ -3,6 +3,7 @@
  * @package articles
  */
 namespace Bitweaver\Articles;
+
 use Bitweaver\KernelTools;
 global $gBitSystem, $gBitUser, $gBitSmarty;
 $pRegisterHash = [
@@ -15,9 +16,9 @@ $pRegisterHash = [
 define( 'ARTICLES_PKG_NAME', $pRegisterHash['package_name'] );
 define( 'ARTICLES_PKG_URL', BIT_ROOT_URL . basename( $pRegisterHash['package_path'] ) . '/' );
 define( 'ARTICLES_PKG_PATH', BIT_ROOT_PATH . basename( $pRegisterHash['package_path'] ) . '/' );
-define( 'ARTICLES_PKG_INCLUDE_PATH', BIT_ROOT_PATH . basename( $pRegisterHash['package_path'] ) . '/includes/'); 
+define( 'ARTICLES_PKG_INCLUDE_PATH', BIT_ROOT_PATH . basename( $pRegisterHash['package_path'] ) . '/includes/');
 define( 'ARTICLES_PKG_CLASS_PATH', BIT_ROOT_PATH . basename( $pRegisterHash['package_path'] ) . '/includes/classes/');
-define( 'ARTICLES_PKG_ADMIN_PATH', BIT_ROOT_PATH . basename( $pRegisterHash['package_path'] ) . '/admin/'); 
+define( 'ARTICLES_PKG_ADMIN_PATH', BIT_ROOT_PATH . basename( $pRegisterHash['package_path'] ) . '/admin/');
 
 $gBitSystem->registerPackage( $pRegisterHash );
 
@@ -30,14 +31,14 @@ if( $gBitSystem->isPackageActive( 'articles' ) ) {
 	define( 'ARTICLE_STATUS_RETIRED', 400 );
 
 	if( $gBitUser->hasPermission( 'p_articles_read' )) {
-		$menuHash = array(
+		$menuHash = [
 			'package_name'       => ARTICLES_PKG_NAME,
 			'index_url'          => ARTICLES_PKG_URL.'index.php',
 			'menu_template'      => 'bitpackage:articles/menu_articles.tpl',
 			'admin_comments_url' => ARTICLES_PKG_URL.'admin/admin_types.php',
-		);
+		];
 		$gBitSystem->registerAppMenu( $menuHash );
 	}
 
-	$gBitSystem->registerNotifyEvent( array( "article_submitted" => KernelTools::tra( "A user submits an article" ) ) );
+	$gBitSystem->registerNotifyEvent( [ "article_submitted" => KernelTools::tra( "A user submits an article" ) ] );
 }

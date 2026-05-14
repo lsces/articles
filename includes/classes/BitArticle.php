@@ -22,6 +22,7 @@
  * Required setup
  */
 namespace Bitweaver\Articles;
+
 use Bitweaver\BitBase;
 use Bitweaver\BitDate;
 use Bitweaver\Liberty\LibertyContent;
@@ -54,14 +55,14 @@ class BitArticle extends LibertyMime
 	{
 		parent::__construct();
 		$this->registerContentType(
-			BITARTICLE_CONTENT_TYPE_GUID, array(
+			BITARTICLE_CONTENT_TYPE_GUID, [
 				'content_type_guid' => BITARTICLE_CONTENT_TYPE_GUID,
 				'content_name' => 'Article',
 				'handler_class' => 'BitArticle',
 				'handler_package' => 'articles',
 				'handler_file' => 'BitArticle.php',
-				'maintainer_url' => 'https://www.bitweaver.org'
-		));
+				'maintainer_url' => 'https://www.bitweaver.org',
+		], );
 		$this->mContentId = $pContentId;
 		$this->mArticleId = $pArticleId;
 		$this->mTypeId  = NULL;
@@ -160,7 +161,7 @@ class BitArticle extends LibertyMime
 			$table = BIT_DB_PREFIX."articles";
 
 			if ( $this->isValid() ) {
-				$result = $this->mDb->associateUpdate( $table, $pParamHash['article_store'], array( "article_id" => $this->mArticleId ));
+				$result = $this->mDb->associateUpdate( $table, $pParamHash['article_store'], [ "article_id" => $this->mArticleId ]);
 			} else {
 				$pParamHash['article_store']['content_id'] = $pParamHash['content_id'];
 				$pParamHash['article_store']['article_id'] = ( isset( $pParamHash['article_id'] ) && is_numeric( $pParamHash['article_id'] ) ) ? $pParamHash['article_id'] : $this->mDb->GenID( 'articles_article_id_seq' );
@@ -250,10 +251,10 @@ class BitArticle extends LibertyMime
 			$dateString = $this->mDate->gmmktime(
 				$pParamHash['publish_Hour'],
 				$pParamHash['publish_Minute'],
-				isset( $pParamHash['publish_Second'] ) ? $pParamHash['publish_Second'] : 0,
+				$pParamHash['publish_Second'] ?? 0,
 				$pParamHash['publish_Month'],
 				$pParamHash['publish_Day'],
-				$pParamHash['publish_Year']
+				$pParamHash['publish_Year'],
 			);
 
 			$timestamp = $this->mDate->getUTCFromDisplayDate( $dateString );
@@ -269,10 +270,10 @@ class BitArticle extends LibertyMime
 			$dateString = $this->mDate->gmmktime(
 				$pParamHash['expire_Hour'],
 				$pParamHash['expire_Minute'],
-				isset( $pParamHash['expire_Second'] ) ? $pParamHash['expire_Second'] : 0,
+				$pParamHash['expire_Second'] ?? 0,
 				$pParamHash['expire_Month'],
 				$pParamHash['expire_Day'],
-				$pParamHash['expire_Year']
+				$pParamHash['expire_Year'],
 			);
 
 			$timestamp = $this->mDate->getUTCFromDisplayDate( $dateString );
@@ -295,7 +296,7 @@ class BitArticle extends LibertyMime
 		}
 
 		// content preferences
-		$prefs = array();
+		$prefs = [];
 		if ($gBitUser->hasPermission( 'p_liberty_enter_html' )) {
 			$prefs[] = 'content_enter_html';
 		}
@@ -304,7 +305,7 @@ class BitArticle extends LibertyMime
 			$pParamHash['preferences_store'][$pref] = ( !empty( $pParamHash['preferences'][$pref] ) ) ? $pParamHash['preferences'][$pref] : null;
 		}
 
-		if (array_search( $pParamHash['article_store']['status_id'], array( ARTICLE_STATUS_DENIED, ARTICLE_STATUS_DRAFT, ARTICLE_STATUS_PENDING ) )) {
+		if (array_search( $pParamHash['article_store']['status_id'], [ ARTICLE_STATUS_DENIED, ARTICLE_STATUS_DRAFT, ARTICLE_STATUS_PENDING ] )) {
 			$this->mInfo["no_index"] = true;
 		}
 
@@ -399,7 +400,7 @@ class BitArticle extends LibertyMime
 		if ( $this->isValid() ) {
 			$this->StartTrans();
 			$query = "DELETE FROM `".BIT_DB_PREFIX."articles` WHERE `content_id` = ?";
-			$result = $this->mDb->query( $query, array( $this->mContentId ) );
+			$result = $this->mDb->query( $query, [ $this->mContentId ] );
 			if ( LibertyMime::expunge() ) {
 				$ret = TRUE;
 				$this->CompleteTrans();
@@ -440,7 +441,7 @@ class BitArticle extends LibertyMime
 
 		$joinSql = '';
 		$selectSql = '';
-		$bindVars = array();
+		$bindVars = [];
 		array_push( $bindVars, $this->mContentTypeGuid );
 		$this->getServicesSql( 'content_list_sql_function', $selectSql, $joinSql, $whereSql, $bindVars, NULL, $pParamHash );
 
@@ -488,7 +489,7 @@ class BitArticle extends LibertyMime
 			// show only future
 			// if we're trying to view these articles, we better have the perms to do so
 			if ( !$gBitUser->hasPermission( 'p_articles_admin' )) {
-				return array();
+				return [];
 			}
 			$whereSql .= " AND a.`publish_date` > ?";
 			$bindVars[] = (int) $now;
@@ -496,7 +497,7 @@ class BitArticle extends LibertyMime
 			// show only expired articles
 			// if we're trying to view these articles, we better have the perms to do so
 			if ( !$gBitUser->hasPermission( 'p_articles_admin' )) {
-				return array();
+				return [];
 			}
 			$whereSql .= " AND a.`expire_date` < ? ";
 			$bindVars[] = (int) $now;
@@ -548,7 +549,7 @@ class BitArticle extends LibertyMime
 			WHERE lc.`content_type_guid` = ? $whereSql";
 
 		$result = $this->mDb->query( $query, $bindVars, $pParamHash['max_records'], $pParamHash['offset'] );
-		$ret = array();
+		$ret = [];
 		$comment = new LibertyComment();
 		while ( $res = $result->fetchRow() ) {
 			// get this stuff parsed
@@ -572,10 +573,10 @@ class BitArticle extends LibertyMime
 		return $ret;
 	}
 
-    /**
-    * Returns include file that will setup vars for display
-    * @return string the fully specified path to file to be included
-    */
+	/**
+	* Returns include file that will setup vars for display
+	* @return string the fully specified path to file to be included
+	*/
 	public function getRenderFile()
 	{
 		return ARTICLES_PKG_PATH."display_article_inc.php";
@@ -631,13 +632,13 @@ class BitArticle extends LibertyMime
 		return $ret;
 	}
 
-    /**
-    * Function that returns link to display an image
-    * @return string the url to display the gallery.
-    */
+	/**
+	* Function that returns link to display an image
+	* @return string the url to display the gallery.
+	*/
 	public function getDisplayUrl()
 	{
-		$info = array( 'article_id' => $this->mArticleId );
+		$info = [ 'article_id' => $this->mArticleId ];
 		return self::getDisplayUrlFromHash( $info );
 	}
 

@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
  * @version $Header$
  * @package articles
@@ -12,7 +12,6 @@ require_once '../kernel/includes/setup_inc.php';
 
 use Bitweaver\KernelTools;
 use Bitweaver\Liberty\LibertyContent;
-use Bitweaver\Articles\BitArticle;
 
 $gBitSystem->isPackageActive( 'articles' );
 $gBitSystem->isFeatureActive( 'articles_rankings' );

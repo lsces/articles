@@ -10,11 +10,10 @@
  */
 use Bitweaver\Articles\BitArticle;
 
-
 extract( $moduleParams );
 
 $articles = new BitArticle();
-$stati = array( 'pending', 'approved' );
+$stati = [ 'pending', 'approved' ];
 $status_id = ( !empty( $module_params['status'] ) && in_array( $module_params['status'], $stati ) ) ? constant( 'ARTICLE_STATUS_' . strtoupper( $module_params['status'] ) ) : ARTICLE_STATUS_APPROVED;
 
 $sortOptions = [

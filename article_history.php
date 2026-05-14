@@ -17,7 +17,6 @@
  * required setup
  */
 require_once '../kernel/includes/setup_inc.php';
-use Bitweaver\Articles\BitArticle;
 use Bitweaver\KernelTools;
 
 $gBitSystem->verifyPackage( 'articles' );
@@ -38,7 +37,7 @@ if( !$gContent->isValid() || empty( $gContent->mInfo ) ) {
 // additionally we need to check if this article is a submission and see if user has perms to view it.
 if( $gContent->getField( 'status_id' ) != ARTICLE_STATUS_APPROVED && !( $gContent->hasUserPermission( 'p_articles_update_submission' ) || $gBitUser->isAdmin() ) ) {
 	$gBitSmarty->assign( 'msg', KernelTools::tra( "Permission denied you cannot view this article" ) );
-	$gBitSystem->display( "error.tpl" , NULL, array( 'display_mode' => 'display' ));
+	$gBitSystem->display( "error.tpl" , NULL, [ 'display_mode' => 'display' ]);
 	die;
 }
 
@@ -59,4 +58,4 @@ $gBitSmarty->assign( 'numPages', $numPages );
 
 // Display the template
 $gBitSmarty->assign( 'gContent', $gContent );
-$gBitSystem->display( 'bitpackage:articles/article_history.tpl', NULL, array( 'display_mode' => 'display' ));
+$gBitSystem->display( 'bitpackage:articles/article_history.tpl', NULL, [ 'display_mode' => 'display' ]);

@@ -12,6 +12,7 @@
  * Required setup
  */
 namespace Bitweaver\Articles;
+
 use Bitweaver\BitBase;
 use Bitweaver\KernelTools;
 
@@ -48,7 +49,7 @@ class BitArticleTopic extends BitBase
 
 			$sql = "SELECT artt.*".
 				   "FROM `".BIT_DB_PREFIX."article_topics` artt ".
-			   	   $whereSQL;
+				   $whereSQL;
 			$this->mInfo = $this->mDb->getRow($sql, $bindVars);
 
 			if( !empty( $this->mInfo['topic_id'] ) ) {
@@ -120,7 +121,7 @@ class BitArticleTopic extends BitBase
 			}
 
 			if( $iParamHash['topic_id'] ) {
-				$this->mDb->associateUpdate( BIT_DB_PREFIX."article_topics", $iParamHash, array( 'topic_id' => $iParamHash['topic_id'] ) );
+				$this->mDb->associateUpdate( BIT_DB_PREFIX."article_topics", $iParamHash, [ 'topic_id' => $iParamHash['topic_id'] ] );
 			} else {
 				$iParamHash['topic_id'] = $topicId;
 				$this->mDb->associateInsert( BIT_DB_PREFIX."article_topics", $iParamHash );
@@ -193,19 +194,19 @@ class BitArticleTopic extends BitBase
 
 		$result = $gBitSystem->mDb->query( $query, $bindVars );
 
-        $ret = [];
+		$ret = [];
 
-        while ( $res = $result->fetchRow() ) {
+		while ( $res = $result->fetchRow() ) {
 			$res["num_articles"] = $gBitSystem->mDb->getOne( "SELECT COUNT(*) FROM `".BIT_DB_PREFIX."articles` WHERE `topic_id`= ?", [ $res["topic_id"] ] );
 			if ( empty( $res['topic_image_url'] ) && $res['has_topic_image'] == 'y' ) {
 				$res['topic_image_url'] = BitArticleTopic::getTopicImageStorageUrl( $res['topic_id'] );
 			}
 
-            $ret[] = $res;
-        }
+			$ret[] = $res;
+		}
 
-        return $ret;
-    }
+		return $ret;
+	}
 
 	public function removeTopicImage()
 	{
@@ -214,7 +215,7 @@ class BitArticleTopic extends BitBase
 				@unlink( $this->getTopicImageStoragePath() );
 			}
 			$sql = "UPDATE `".BIT_DB_PREFIX."article_topics` SET `has_topic_image` = 'n' WHERE `topic_id` = ?";
-			$rs = $this->mDb->query($sql, array($this->mTopicId));
+			$rs = $this->mDb->query($sql, [$this->mTopicId]);
 			$this->mInfo['has_topic_image'] = 'n';
 		}
 	}
@@ -232,7 +233,7 @@ class BitArticleTopic extends BitBase
 	public function setActivation($iIsActive = FALSE)
 	{
 		$sql = "UPDATE `".BIT_DB_PREFIX."article_topics` SET `active_topic` = '".($iIsActive ? 'y' : 'n')."' WHERE `topic_id` = ?";
-		$rs = $this->mDb->query($sql, array($this->mTopicId));
+		$rs = $this->mDb->query($sql, [$this->mTopicId]);
 		$this->mInfo['active_topic'] = ($iIsActive ? 'y' : 'n');
 	}
 
@@ -274,9 +275,6 @@ class BitArticleTopic extends BitBase
 		$sql = "DELETE FROM `".BIT_DB_PREFIX."article_topics` WHERE `topic_id` = ?";
 		$rs = $this->mDb->query($sql, [ $this->mTopicId ]);
 	}
-
-
-
 
 	/*****************************************************************************
 	 * Image functions needed for backward compatability - these are needed to   *
@@ -330,9 +328,9 @@ class BitArticleTopic extends BitBase
 
 		if ( !empty( $pTopicId ) ) {
 			return $path.BitArticleTopic::getTopicImageStorageName( $pTopicId );
-		} else {
-			return '';
 		}
+			return '';
+
 	}
 
 	/**
@@ -369,9 +367,6 @@ class BitArticleTopic extends BitBase
 
 		return str_replace( "//", "/", $ret );
 	}
-
-
-
 
 	/*****************************************************************************
 	 * Image functions needed for backward compatability - these are needed to   *
@@ -432,9 +427,9 @@ class BitArticleTopic extends BitBase
 
 		if ( !empty( $pArticleId ) ) {
 			return $path.BitArticleTopic::getArticleImageStorageName( $pArticleId );
-		} else {
-			return FALSE;
 		}
+			return FALSE;
+
 	}
 
 	/**
@@ -462,8 +457,8 @@ class BitArticleTopic extends BitBase
 
 		if ( is_file( BitArticleTopic::getArticleImageStoragePath( NULL, TRUE ).BitArticleTopic::getArticleImageStorageName( $pArticleId ) ) ) {
 			return $url.BitArticleTopic::getArticleImageStorageName( $pArticleId ).( $pForceRefresh ? "?".$gBitSystem->getUTCTime() : '' );
-		} else {
-			return FALSE;
 		}
+			return FALSE;
+
 	}
 }

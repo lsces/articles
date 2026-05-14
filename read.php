@@ -46,7 +46,7 @@ $gContent->addHit();
 $gBitSmarty->assign( 'article', $gContent->mInfo );
 
 // get all the services that want to display something on this page
-$displayHash = array( 'perm_name' => 'p_articles_read' );
+$displayHash = [ 'perm_name' => 'p_articles_read' ];
 $gContent->invokeServices( 'content_display_function', $displayHash );
 
 $topics = BitArticleTopic::getTopicList();
@@ -54,7 +54,7 @@ $gBitSmarty->assign( 'topics', $topics );
 
 // Comments engine!
 if( @$gContent->mInfo['allow_comments'] == 'y' ) {
-	$comments_vars = Array( 'article' );
+	$comments_vars = [ 'article' ];
 	$comments_prefix_var='article:';
 	$comments_object_var='article';
 	$commentsParentId = $gContent->mContentId;

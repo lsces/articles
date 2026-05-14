@@ -50,12 +50,12 @@ if( !empty( $_REQUEST['action'] ) ) {
 		$formHash['action'] = 'remove';
 		$formHash['status_id'] = ( !empty( $_REQUEST['status_id'] ) ? $_REQUEST['status_id'] : '' );
 		$formHash['remove_article_id'] = $_REQUEST['remove_article_id'];
-		$msgHash = array(
+		$msgHash = [
 			'label' => KernelTools::tra('Remove Article'),
 			'confirm_item' => $tmpArt->mInfo['title'],
 			'warning' => KernelTools::tra('Remove the above article.'),
 			'error' => KernelTools::tra('This cannot be undone!'),
-		);
+		];
 		$gBitSystem->confirmDialog( $formHash, $msgHash );
 	}
 }
@@ -83,4 +83,4 @@ $gBitSmarty->assign( 'listInfo', $_REQUEST['listInfo'] );
 $gBitSmarty->assign( 'listpages', $listArticles );
 
 // Display the template
-$gBitSystem->display( 'bitpackage:articles/list_articles.tpl', KernelTools::tra( "Articles" ), array( 'display_mode' => 'list' ));
+$gBitSystem->display( 'bitpackage:articles/list_articles.tpl', KernelTools::tra( "Articles" ), [ 'display_mode' => 'list' ]);

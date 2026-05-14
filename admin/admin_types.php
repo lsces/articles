@@ -41,10 +41,10 @@ $artTypes = [
 		'name' => KernelTools::tra( 'Show avatar' ),
 		'desc' => KernelTools::tra( 'Show author\'s avatar' ),
 	],
-	'show_author'      => array(
+	'show_author'      => [
 		'name' => KernelTools::tra( 'Show author' ),
 		'desc' => KernelTools::tra( 'Show author\'s name' ),
-	),
+	],
 	'show_pubdate'     => [
 		'name' => KernelTools::tra( 'Show publish date' ),
 		'desc' => KernelTools::tra( 'Show publication date' ),
@@ -71,9 +71,9 @@ $gBitSmarty->assign( 'artTypes', $artTypes );
 $gContent = new BitArticleType( !empty( $_REQUEST['article_type_id'] ) ? $_REQUEST['article_type_id'] : NULL );
 
 if( isset( $_REQUEST["add_type"] ) ) {
-    $gContent->storeType( $_REQUEST );
+	$gContent->storeType( $_REQUEST );
 } elseif( isset( $_REQUEST["remove_type"] ) ) {
-    $gContent->removeType( $_REQUEST['remove_type'] );
+	$gContent->removeType( $_REQUEST['remove_type'] );
 } elseif( isset( $_REQUEST["update_type"] ) ) {
 	foreach( array_keys( $_REQUEST["type_array"] ) as $this_type ) {
 		$storeHash['article_type_id'] = $this_type;
@@ -81,8 +81,8 @@ if( isset( $_REQUEST["add_type"] ) ) {
 			$storeHash[$option] = !empty( $_REQUEST[$option][$this_type] ) ? 'y' : 'n';
 		}
 		$storeHash['type_name'] = $_REQUEST['type_name'][$this_type];
-        $gContent->storeType( $storeHash );
-    }
+		$gContent->storeType( $storeHash );
+	}
 }
 
 $types = BitArticleType::getTypeList();
