@@ -17,11 +17,12 @@ $gBitSystem->verifyPackage( 'rss' );
 $gBitSystem->verifyFeature( 'articles_rss' );
 
 use Bitweaver\Articles\BitArticle;
+use Bitweaver\KernelTools;
 
 require_once( RSS_PKG_INCLUDE_PATH.'rss_inc.php' );
 
-$rss->title = $gBitSystem->getConfig( 'articles_rss_title', $gBitSystem->getConfig( 'site_title' ).' - '.tra( 'Articles' ) );
-$rss->description = $gBitSystem->getConfig( 'articles_rss_description', $gBitSystem->getConfig( 'site_title' ).' - '.tra( 'RSS Feed' ) );
+$rss->title = $gBitSystem->getConfig( 'articles_rss_title', $gBitSystem->getConfig( 'site_title' ).' - '.KernelTools::tra( 'Articles' ) );
+$rss->description = $gBitSystem->getConfig( 'articles_rss_description', $gBitSystem->getConfig( 'site_title' ).' - '.KernelTools::tra( 'RSS Feed' ) );
 
 // check permission to view articles
 if( !$gBitUser->hasPermission( 'p_articles_read' ) ) {
