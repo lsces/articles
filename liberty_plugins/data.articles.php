@@ -20,6 +20,8 @@
 // +----------------------------------------------------------------------+
 // $Id$
 
+namespace Bitweaver\Liberty;
+
 use Bitweaver\Articles\BitArticle;
 use Bitweaver\KernelTools;
 
