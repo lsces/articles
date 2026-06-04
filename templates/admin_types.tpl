@@ -27,14 +27,14 @@
 								<td>
 									<input type="hidden" name="type_array[{$types[user].article_type_id}]" />
 									<input type="text" name="type_name[{$types[user].article_type_id}]" value="{$types[user].type_name}" />
-									<a href="{$smarty.const.ARTICLES_PKG_URL}index.php?type_id={$types[user].article_type_id}">{booticon iname="icon-search"   iexplain="List Articles"}</a>
+									<a href="{$smarty.const.ARTICLES_PKG_URL}index.php?type_id={$types[user].article_type_id}">{biticon ipackage="icons" iname="edit-find"   iexplain="List Articles"}</a>
 								</td>
 								{foreach from=$artTypes item=artType key=key}
 									<td style="text-align:center;"><input title="{$artType.name}" type="checkbox" name="{$key}[{$types[user].article_type_id}]" {if $types[user].$key eq 'y'}checked="checked"{/if} /></td>
 								{/foreach}
 								<td style="text-align:center;">
 									{if $types[user].article_cnt eq 0}
-										{smartlink ititle="remove" booticon="icon-trash" remove_type=$types[user].article_type_id}
+										{smartlink ititle="remove" biticon="edit-delete" remove_type=$types[user].article_type_id}
 									{else}
 										{$types[user].article_cnt}
 									{/if}
@@ -82,7 +82,7 @@
 							{/foreach}
 							<li>
 								{if $types[user].article_cnt eq 0}
-									<a title="{tr}Remove{/tr}" href="{$smarty.const.ARTICLES_PKG_URL}admin/admin_types.php?remove_type={$types[user].article_type_id}">{booticon iname="icon-trash" ipackage="icons" iexplain=remove}</a> {tr}Remove Type{/tr}
+									<a title="{tr}Remove{/tr}" href="{$smarty.const.ARTICLES_PKG_URL}admin/admin_types.php?remove_type={$types[user].article_type_id}">{biticon ipackage="icons" iname="edit-delete" ipackage="icons" iexplain=remove}</a> {tr}Remove Type{/tr}
 								{else}
 									{tr}Number of Entries{/tr}: {$types[user].article_cnt}
 								{/if}
