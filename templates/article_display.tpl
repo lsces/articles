@@ -15,7 +15,7 @@
 		{/if}
 		{*<a style="display:none;" href="{$smarty.const.ARTICLES_PKG_URL}print.php?article_id={$article.article_id}">{biticon ipackage="icons" iname="document-print"  ipackage="icons"  iexplain=print}</a>*}
 		{if $gContent->hasUserPermission( 'p_articles_remove' )}
-			{smartlink ititle="Remove" ipackage=articles ifile="list.php" biticon="edit-delete" action=remove remove_article_id=$article.article_id status_id=$smarty.request.status_id|default:0}
+			{smartlink ititle="Remove" ipackage=articles ifile="list.php" biticon="user-trash" action=remove remove_article_id=$article.article_id status_id=$smarty.request.status_id|default:0}
 		{/if}
 	</div><!-- end .footer -->
 

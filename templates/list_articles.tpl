@@ -142,7 +142,7 @@
 							{/if}
 
 							{if $gBitUser->hasPermission( 'p_articles_remove' )}
-								{smartlink ititle="Remove" biticon="edit-delete" action=remove remove_article_id=$article.article_id status_id=$smarty.request.status_id}
+								{smartlink ititle="Remove" biticon="user-trash" action=remove remove_article_id=$article.article_id status_id=$smarty.request.status_id}
 							{/if}
 						</td>
 					</tr>
