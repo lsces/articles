@@ -138,7 +138,7 @@
 							{/if}
 
 							{if $gBitUser->hasPermission( 'p_articles_update' ) || ( $article.author eq $user && $article.creator_edit eq 'y' )}
-								{smartlink ititle="Edit" ifile="edit.php" biticon="document-properties" article_id=$article.article_id}
+								{smartlink ititle="Edit" ifile="edit.php" biticon="edit" article_id=$article.article_id}
 							{/if}
 
 							{if $gBitUser->hasPermission( 'p_articles_remove' )}

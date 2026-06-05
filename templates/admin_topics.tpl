@@ -71,7 +71,7 @@
 					</td>
 
 					<td align="right">
-						{smartlink ititle='edit' biticon="document-properties" ifile='edit_topic.php' topic_id=$topics[user].topic_id}
+						{smartlink ititle='edit' biticon="edit" ifile='edit_topic.php' topic_id=$topics[user].topic_id}
 						{* smartlink ititle='permissions' biticon="lock" ipackage='kernel' ifile='object_permissions.php' objectName="Topic `$topics[user].name`" object_type=topic permType=topics object_id=$topics[user].topic_id *}
 						<br />
 						<a href="{$smarty.const.ARTICLES_PKG_URL}admin/admin_topics.php?fRemoveTopic=1&amp;topic_id={$topics[user].topic_id}">{biticon ipackage="icons" iname="user-trash" ipackage="icons" iforce=icon_text iexplain="Remove Topic"}</a>
