@@ -69,7 +69,6 @@ class BitArticle extends LibertyMime
 		$this->mTopicId = NULL;
 		$this->mContentTypeGuid = BITARTICLE_CONTENT_TYPE_GUID;
 		$this->mDate = new BitDate();
-		$offset = $this->mDate->get_display_offset();
 
 		// Permission setup
 		$this->mViewContentPerm  = 'p_articles_read';
