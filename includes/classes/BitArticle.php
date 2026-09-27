@@ -505,8 +505,8 @@ class BitArticle extends LibertyMime
 			// we need all these AND and ORs to ensure that other conditions such as status_id are respected as well
 			// an unset publish_date/expire_date means no scheduling restriction was ever set - NULL
 			// comparisons evaluate to false in SQL, so without the explicit IS NULL checks below a
-			// row with no dates set at all was silently excluded rather than always shown (found live
-			// on medw - old migrated articles with no publish_date/expire_date/article_type_id at all)
+			// row with no dates set at all was silently excluded rather than always shown (hit by
+			// old migrated articles with no publish_date/expire_date/article_type_id at all)
 			$whereSql .= " AND (( a.`publish_date` > a.`expire_date` ) OR (( a.`publish_date` IS NULL OR a.`publish_date` < ? OR atype.`show_pre_publ` = ? ) AND ( a.`expire_date` IS NULL OR a.`expire_date` > ? OR atype.`show_post_expire` = ? ))) ";
 			$bindVars[] = (int) $now;
 			$bindVars[] = 'y';
