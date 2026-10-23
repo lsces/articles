@@ -18,6 +18,7 @@ $gBitSystem->verifyFeature( 'articles_rss' );
 
 use Bitweaver\Articles\BitArticle;
 use Bitweaver\KernelTools;
+use Bitweaver\Rss\FeedItem;
 
 require_once( RSS_PKG_INCLUDE_PATH.'rss_inc.php' );
 
@@ -53,7 +54,7 @@ if( !$gBitUser->hasPermission( 'p_articles_read' ) ) {
 		$parseHash['content_id'] = $feed['content_id'];
 		$parseHash['format_guid'] = $feed['format_guid'];
 		$parseHash['data'] = preg_replace( LIBERTY_SPLIT_REGEX, "", $feed['data'] );
-		$item->description = $articles->parseData( $parseHash );
+		$item->description = BitArticle::parseDataHash( $parseHash );
 
 		$item->date = (int) $feed['publish_date'];
 		$item->source = BIT_ROOT_URI;
