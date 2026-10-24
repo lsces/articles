@@ -122,7 +122,7 @@
 						{/if}
 
 						<div class="form-group submit">
-							<input type="submit" class="btn btn-default" name="preview" value="{tr}Preview{/tr}" />&nbsp;
+							<input type="submit" class="btn btn-default" name="preview" value="{tr}Preview{/tr}" />
 							<input type="submit" class="btn btn-default" name="save" value="{tr}Save{/tr}" />
 						</div>
 
