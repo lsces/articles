@@ -420,6 +420,11 @@ class BitArticle extends LibertyMime
 		return( $this->verifyId( $this->mArticleId ) && $this->verifyId( $this->mContentId ) );
 	}
 
+	/** What the article list can sort by, on top of the content columns. */
+	public static function getSortModeFields(): array {
+		return array_merge( parent::getSortModeFields(), [ 'article_id', 'author_name', 'publish_date', 'expire_date', 'rating', 'topic_id', 'topic_name', 'status_id', 'status_name', 'hits', 'article_type_id', 'type_name' ] );
+	}
+
 	/**
 	* This function generates a list of records from the liberty_content database for use in a list page
 	* @param $pParamHash contains an array of conditions to sort by
@@ -543,7 +548,7 @@ class BitArticle extends LibertyMime
 				LEFT OUTER JOIN `".BIT_DB_PREFIX."liberty_files`         lf ON( lf.`file_id`            = la.`foreign_id` )
 				$joinSql
 			WHERE lc.`content_type_guid` = ? $whereSql
-			ORDER BY ".$this->mDb->convertSortmode( $pParamHash['sort_mode'] );
+			ORDER BY ".$this->convertSortMode( $pParamHash['sort_mode'], 'publish_date_desc' );
 
 		$query_cant = "SELECT COUNT( * )FROM `".BIT_DB_PREFIX."articles` a
 			INNER JOIN      `".BIT_DB_PREFIX."liberty_content`    lc ON lc.`content_id`   = a.`content_id`
